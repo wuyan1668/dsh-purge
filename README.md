@@ -4,18 +4,18 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.1.93</strong></p>
+<p align="center"><strong>Version 1.1.94</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness jailbreak: every model, swap prompts per model. Default prompt for 小码酱. Please star ⭐ If you build on this, see Attribution required.</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/wuyan1668/dsh-purge-/stargazers"><img src="https://img.shields.io/github/stars/wuyan1668/dsh-purge-?logo=github&label=Stars" alt="GitHub stars"></a>
-  <a href="https://github.com/wuyan1668/dsh-purge-/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat" alt="Apache-2.0"></a>
+  <a href="https://github.com/wuyan1668/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/wuyan1668/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
+  <a href="https://github.com/wuyan1668/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat" alt="Apache-2.0"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
   <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.0--rc.2%20%2F%200.2.1--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.1-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
@@ -31,7 +31,7 @@
 
 ## A note from the maintainers
 
-dsh-purge was originally developed by its author as an independent project. It is now maintained by the **dsh-purge maintainers team**, which handles the codebase, documentation, releases, and security response. All historical commits, issues, and releases are preserved and links remain unchanged; the original author's credit and source record are retained.
+dsh-purge was originally developed by **YuJunZhiXue** as an independent project. It is now maintained by **wuyan1668**, who owns the ongoing development — the codebase, documentation, releases and security response. The project now lives in a standalone repository at [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge), no longer a fork. All historical commits, issues and releases are preserved and links remain unchanged; the original author's credit and source record are retained. The full attribution chain is in [NOTICE](./NOTICE).
 
 The project's boundaries remain unchanged:
 
@@ -40,9 +40,9 @@ The project's boundaries remain unchanged:
 
 **About the paid content.** Everything the paid build includes is included in the open-source build. No feature or data in this repository requires payment to unlock; the skill library and knowledge base are part of the open-source release.
 
-**Resale of the original build is prohibited.** Paid resale, re-skinning for store listings, and distribution as a commercial product are not permitted. Forks and derivative work are allowed provided they credit the source repository: [wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-). Removing the attribution, concealing the source, or presenting the project as one's own will be pursued by the maintainers. Third-party builds are not affiliated with the original author or this team; their maintainers are solely responsible for them.
+**Resale of the original build is prohibited.** Paid resale, re-skinning for store listings, and distribution as a commercial product are not permitted. Forks and derivative work are allowed provided they credit the source repository: [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge). Removing the attribution, concealing the source, or presenting the project as one's own will be pursued by the maintainers. Third-party builds are not affiliated with the original author or this team; their maintainers are solely responsible for them.
 
-Official channels: this repository's [Issues](https://github.com/wuyan1668/dsh-purge-/issues) and [Releases](https://github.com/wuyan1668/dsh-purge-/releases), plus the team channel [t.me/LLM_PoJia](https://t.me/LLM_PoJia). No other channel, group, or account is run by the team.
+Official channels: this repository's [Issues](https://github.com/wuyan1668/dsh-purge/issues) and [Releases](https://github.com/wuyan1668/dsh-purge/releases), plus the team channel [t.me/LLM_PoJia](https://t.me/LLM_PoJia). No other channel, group, or account is run by the team.
 
 > **⚠️ Notice: impersonation, modified builds and payment scams (2026-11-05)**
 >
@@ -54,7 +54,7 @@ Official channels: this repository's [Issues](https://github.com/wuyan1668/dsh-p
 >
 > The original author has reported the impersonation and personal-data leak to the police; the maintainers are cooperating fully and the evidence has been handed over. The author has also posted a statement on their own account. Out of respect for the author's privacy and the case itself, the police receipt and related screenshots are not published.
 >
-> **There are only two official channels:** this repository [wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-) (Issues / Releases) and the team channel [t.me/LLM_PoJia](https://t.me/LLM_PoJia). No other channel, group, or account is run by the team; the team never charges, fundraises, or asks for personal information through personal accounts or DMs. The open-source build is free; commercial licensing goes through [LICENSE-COMMERCIAL.md](./LICENSE-COMMERCIAL.md).
+> **There are only two official channels:** this repository [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge) (Issues / Releases) and the team channel [t.me/LLM_PoJia](https://t.me/LLM_PoJia). No other channel, group, or account is run by the team; the team never charges, fundraises, or asks for personal information through personal accounts or DMs. The open-source build is free; commercial licensing goes through [LICENSE-COMMERCIAL.md](./LICENSE-COMMERCIAL.md).
 >
 > Do not send money to unofficial accounts, and do not reshare screenshots containing the author's personal information. Report impersonations to the platform.
 >
@@ -78,7 +78,7 @@ Official channels: this repository's [Issues](https://github.com/wuyan1668/dsh-p
 
 ## What this is
 
-**dsh-purge** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine. **1.1.93** targets **DSH 0.2.2-rc.1** (0.2.1-rc.2 / rc.5 and 0.2.0 still work). **DSH 0.2.1-rc.3 / rc.4 are not supported.** Official **Web** (`dsh web`) and the official **desktop EXE** are both supported. Install and Apply them separately.
+**dsh-purge** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine. **1.1.94** targets **DSH 0.2.2-rc.1** (0.2.1-rc.2 / rc.5 and 0.2.0 still work). **DSH 0.2.1-rc.3 / rc.4 are not supported.** Official **Web** (`dsh web`) and the official **desktop EXE** are both supported. Install and Apply them separately.
 
 Harness does more than forward a prompt. It rewrites prompts, approval gates, sandbox policy, and session migration at runtime. Asking only “will the model answer” treats a host-layer block as a model refusal. This plugin separates those two layers on your own install, for controlled evaluation and for seeing which default policy is too tight.
 
@@ -102,13 +102,15 @@ It only touches the official `@deepseek-ai` packages and local config on the use
 
 **Resale of the original build is prohibited.** Paid resale, re-skinning for store listings, and distribution as a commercial product are not permitted.
 
-**Forks must attribute** and name the source repository: [wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-). Same if you borrow the name, ideas, code, or prompts.
+**Forks must attribute** and name the source repository: [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge). Same if you borrow the name, ideas, code, or prompts.
+
+**Upstream lineage.** This project descends from dsh-purge by **YuJunZhiXue**. The original repository has been removed from GitHub; its full history is archived at [mmparko/dsh-purge](https://github.com/mmparko/dsh-purge) (MIT-licensed mirror up to v1.1.71), and the Apache-2.0 release line continues at [yu994419160/dsh-purge1.7.3-](https://github.com/yu994419160/dsh-purge1.7.3-). Redistributing this project or any derivative of it must keep the copyright notice and [NOTICE](./NOTICE), and name that source.
 
 Removing attribution, concealing the source, or reselling the original will be pursued by the maintainers.
 
 ## License
 
-This repo is [Apache License 2.0](./LICENSE). Forks and redistributions must keep the copyright notice and [NOTICE](./NOTICE), and name [wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-). Resale of the original is prohibited.
+This repo is [Apache License 2.0](./LICENSE). Forks and redistributions must keep the copyright notice and [NOTICE](./NOTICE), and name [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge) as well as the upstream source recorded in the NOTICE. Resale of the original is prohibited.
 
 ---
 
@@ -151,12 +153,12 @@ This repo is [Apache License 2.0](./LICENSE). Forks and redistributions must kee
 
 ## Supported hosts
 
-**1.1.93 and newer target DSH 0.2.2-rc.1.** 0.2.1-rc.2 / rc.5 and 0.2.0 still work. Do not apply it to 0.1.x.
+**1.1.94 and newer target DSH 0.2.2-rc.1.** 0.2.1-rc.2 / rc.5 and 0.2.0 still work. Do not apply it to 0.1.x.
 
-- **dsh 0.2.2-rc.1** (official desktop / official `dsh web`): use **1.1.93** or newer. Adds the 0.2.2 pattern set — approval ask sentence, sandbox escalation `displayReason`, observation intent, the extra `tools` field in assemble, and the deliverable / run-code / approval target moves.
+- **dsh 0.2.2-rc.1** (official desktop / official `dsh web`): use **1.1.94** or newer. Adds the 0.2.2 pattern set — approval ask sentence, sandbox escalation `displayReason`, observation intent, the extra `tools` field in assemble, and the deliverable / run-code / approval target moves.
 - **dsh 0.2.1-rc.2** (official desktop / official `dsh web`): use **1.1.81** or newer. Fixes `{{cwd}}` / `[cwd]` crash, patch #40 match, dropped `toolFilter`, host `dsh-tools` resolve, hostFs fd, desktop helper self-kill, `file:` archive update, Ctrl+Enter steer.
 - **dsh 0.2.0-rc.2**: use **1.1.40** or newer; this line also installs.
-- **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/wuyan1668/dsh-purge-/releases).
+- **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/wuyan1668/dsh-purge/releases).
 - **dsh 0.2.1-rc.3 / rc.4 are not supported.** Unmatched patches stay pending or skipped; nothing is rewritten blindly. Stay on **0.2.2-rc.1** or **0.2.1-rc.2**.
 
 Unmatched patches stay pending or skipped; nothing is rewritten blindly.
@@ -173,10 +175,10 @@ Have `dsh` on PATH? One command, one restart, one click. Run the line for the ho
 
 ```sh
 # Official `dsh web`
-dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 
 # Official desktop EXE
-dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 1. **Fully quit and reopen** the host you installed into. Web: stop `dsh web` and start it again. Desktop: quit the tray icon too, then open the exe.
@@ -201,14 +203,14 @@ pnpm only (no `dsh` required): run this inside the profile you actually use, not
 
 ```sh
 cd "$DSH_HOME/profiles/web"    # desktop: profiles/desktop
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 Windows PowerShell:
 
 ```powershell
 cd "$env:USERPROFILE\.dsh\profiles\web"   # desktop: profiles\desktop
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 `pnpm add` and `dsh plugin add` fetch the package; `postinstall` writes `dsh-purge` into `dsh.profile.bundles` and adds a body `insert` in the profile `cordis.patch.yml`. Without that insert the host never loads the plugin and no button appears.
@@ -218,9 +220,9 @@ pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/mast
 - pnpm 11/12 skips install scripts (`ERR_PNPM_IGNORED_BUILDS`) unless you allow the build:
 
 ```sh
-pnpm add --allow-build=dsh-purge --allow-build=dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add --allow-build=dsh-purge --allow-build=dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 # Already installed, warning only — the full specifier is required (name-only leaves "set this to true or false"):
-pnpm approve-builds dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm approve-builds dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 # If bundles / insert are still missing:
 node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
 ```
@@ -229,7 +231,7 @@ node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
 - On the desktop client you can also click the button (`dsh://` deep link; it still downloads the same tarball).
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.92&repo=wuyan1668%2Fdsh-purge-&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fcodeload.github.com%2Fwuyan1668%2Fdsh-purge-%2Ftar.gz%2Frefs%2Fheads%2Fmaster"><strong>Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.94&repo=wuyan1668%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fcodeload.github.com%2Fwuyan1668%2Fdsh-purge%2Ftar.gz%2Frefs%2Fheads%2Fmaster"><strong>Install in desktop client</strong></a>
 </p>
 
 **Step 3 — Restart the host.** Adding the plugin to a profile does **not** patch `@deepseek-ai` by itself. Fully quit and reopen the host you just installed into (Web: stop `dsh web` and start again; Desktop: quit the tray icon too, then open the exe).
@@ -247,7 +249,7 @@ node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
 
 ```sh
 dsh plugin --profile desktop remove dsh-purge
-dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 pnpm only:
@@ -255,7 +257,7 @@ pnpm only:
 ```sh
 cd "$DSH_HOME/profiles/desktop"
 pnpm remove dsh-purge
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 Swap `desktop` for `web` on Web.
@@ -276,13 +278,13 @@ Install the DeepSeek Harness plugin `dsh-purge` into the Web profile only. Do no
 If `dsh` is on PATH:
 
 ```sh
-dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 If `dsh` is missing and pnpm is available, `cd` into `$DSH_HOME/profiles/web` (often `~/.dsh/profiles/web`) and run:
 
 ```sh
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 If this directory is already a clone and `dsh` exists, use `dsh plugin --profile web add .`. If neither `dsh` nor pnpm is available, tell the user and stop.
@@ -320,10 +322,10 @@ $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_
 **2. Put the plugin at `$DSH_HOME/plugins/dsh-purge`** (folder must be named `dsh-purge`, with a `package.json` whose `"name"` is `dsh-purge`).
 
 ```sh
-git clone https://github.com/wuyan1668/dsh-purge-.git "$DSH_HOME/plugins/dsh-purge"
+git clone https://github.com/wuyan1668/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
 ```
 
-Without git: download [master.tar.gz](https://github.com/wuyan1668/dsh-purge-/archive/refs/heads/master.tar.gz), extract, rename `dsh-purge-master` → `dsh-purge`, and place it under `plugins`. If you already have a clone, copy the whole tree — not a few `.js` files.
+Without git: download [master.tar.gz](https://github.com/wuyan1668/dsh-purge/archive/refs/heads/master.tar.gz), extract, rename `dsh-purge-master` → `dsh-purge`, and place it under `plugins`. If you already have a clone, copy the whole tree — not a few `.js` files.
 
 **3. Edit only that profile's `package.json` — back it up first.** Web → `$DSH_HOME/profiles/web/package.json`; desktop → `$DSH_HOME/profiles/desktop/package.json`. Add **only two things**, keeping every existing dependency and bundle:
 
@@ -602,14 +604,14 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ## Releases
 
-Team channel: [t.me/LLM_PoJia](https://t.me/LLM_PoJia), used for announcements and updates. GitHub [Releases](https://github.com/wuyan1668/dsh-purge-/releases) still hosts older packages. Resale of the original build is prohibited; forks must attribute, and third-party builds are not affiliated with the original author or this team.
+Team channel: [t.me/LLM_PoJia](https://t.me/LLM_PoJia), used for announcements and updates. GitHub [Releases](https://github.com/wuyan1668/dsh-purge/releases) still hosts older packages. Resale of the original build is prohibited; forks must attribute, and third-party builds are not affiliated with the original author or this team.
 
 ## Notes
 
 - Scope is rendered copy, defaults, and runtime logic inside local `@deepseek-ai/*` packages, plus override files and rule sets under the harness home.
 - After an upgrade, unmatched originals show as skipped. Apply still completes, and those files are left unchanged.
 - Third-party plugin *source repos* outside `@deepseek-ai` are left alone (CMD silence may **best-effort** patch installed doctor / market / liangshen / mnemon at runtime).
-- Install from the GitHub tarball (the name is not on npm; skip the plugin market). With `dsh`: `dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master`. pnpm only: `pnpm add` that URL inside `$DSH_HOME/profiles/web`. Use `desktop` for the EXE. From this repo, `add .`.
+- Install from the GitHub tarball (the name is not on npm; skip the plugin market). With `dsh`: `dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master`. pnpm only: `pnpm add` that URL inside `$DSH_HOME/profiles/web`. Use `desktop` for the EXE. From this repo, `add .`.
 
 ---
 

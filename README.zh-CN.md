@@ -4,18 +4,18 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.1.93</strong></p>
+<p align="center"><strong>Version 1.1.94</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/wuyan1668/dsh-purge-/stargazers"><img src="https://img.shields.io/github/stars/wuyan1668/dsh-purge-?logo=github&label=Stars" alt="GitHub stars"></a>
-  <a href="https://github.com/wuyan1668/dsh-purge-/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat" alt="Apache-2.0"></a>
+  <a href="https://github.com/wuyan1668/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/wuyan1668/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
+  <a href="https://github.com/wuyan1668/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat" alt="Apache-2.0"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
   <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.0--rc.2%20%2F%200.2.1--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.1-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
@@ -31,7 +31,7 @@
 
 ## 团队说明
 
-dsh-purge 最初由原作者独立开发。项目现已由 **dsh-purge 维护团队**接管，代码、文档、版本发布与安全响应均由团队负责；历史提交、Issue 与 Release 保持完整，链接不变，原作者的署名与来源记录继续保留。
+dsh-purge 最初由 **YuJunZhiXue** 独立开发。项目现由 **wuyan1668** 维护，并由其负责后续开发 —— 代码、文档、版本发布与安全响应。仓库已转为独立项目，地址为 [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge)，不再是 fork。历史提交、Issue 与 Release 保持完整，链接不变，原作者的署名与来源记录继续保留；完整归属链见 [NOTICE](./NOTICE)。
 
 团队接手后，项目边界维持不变：
 
@@ -40,9 +40,9 @@ dsh-purge 最初由原作者独立开发。项目现已由 **dsh-purge 维护团
 
 **关于付费内容。** 市面上付费版本包含的内容，开源版本全部包含。本仓库没有需要付费才能解锁的功能或数据，技能库与知识库都在开源发行里。
 
-**原版禁止倒卖。** 不得付费转售、换皮上架，或以商品形式分销。允许二次开发，但必须署名并注明来源仓库：[wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-)。未署名、隐瞒来源，或改头换面据为己有的，维护团队将依法追究责任。任何第三方二开版本与原作者及本团队无关，相关责任由该第三方自行承担。
+**原版禁止倒卖。** 不得付费转售、换皮上架，或以商品形式分销。允许二次开发，但必须署名并注明来源仓库：[wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge)。未署名、隐瞒来源，或改头换面据为己有的，维护团队将依法追究责任。任何第三方二开版本与原作者及本团队无关，相关责任由该第三方自行承担。
 
-官方渠道：本仓库的 [Issues](https://github.com/wuyan1668/dsh-purge-/issues) 与 [Releases](https://github.com/wuyan1668/dsh-purge-/releases)，以及团队频道 [t.me/LLM_PoJia](https://t.me/LLM_PoJia)。除此之外，任何频道、群组或账号都不是团队运营的。
+官方渠道：本仓库的 [Issues](https://github.com/wuyan1668/dsh-purge/issues) 与 [Releases](https://github.com/wuyan1668/dsh-purge/releases)，以及团队频道 [t.me/LLM_PoJia](https://t.me/LLM_PoJia)。除此之外，任何频道、群组或账号都不是团队运营的。
 
 > **⚠️ 关于冒充原作者、二次开发与收费诈骗的声明（2026-11-05）**
 >
@@ -54,7 +54,7 @@ dsh-purge 最初由原作者独立开发。项目现已由 **dsh-purge 维护团
 >
 > 原作者已就冒名收费与个人信息泄露报警，团队全程配合，证据已移交警方；原作者本人也已在其个人账号发布声明。出于对原作者个人信息和案件本身的保护，回执与相关截图不在公开渠道展示。
 >
-> **官方渠道只有两处：** 本仓库 [wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-)（Issues / Releases）与团队频道 [t.me/LLM_PoJia](https://t.me/LLM_PoJia)。除此之外，任何频道、群组或账号都不是团队运营的；团队不会通过私人账号或私聊收费、募捐、索要个人信息。开源版免费，商业授权只走 [LICENSE-COMMERCIAL.md](./LICENSE-COMMERCIAL.md)。
+> **官方渠道只有两处：** 本仓库 [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge)（Issues / Releases）与团队频道 [t.me/LLM_PoJia](https://t.me/LLM_PoJia)。除此之外，任何频道、群组或账号都不是团队运营的；团队不会通过私人账号或私聊收费、募捐、索要个人信息。开源版免费，商业授权只走 [LICENSE-COMMERCIAL.md](./LICENSE-COMMERCIAL.md)。
 >
 > 请不要向任何非官方账号转账，也不要转发涉及原作者个人信息的截图。遇到冒充，截图后向对应平台举报。
 >
@@ -78,7 +78,7 @@ dsh-purge 最初由原作者独立开发。项目现已由 **dsh-purge 维护团
 
 ## 介绍
 
-**dsh-purge** 是装在本机官方 [DeepSeek Harness](https://www.deepseek.com/harness/) 上的网络安全红队评测插件。当前 **1.1.93** 已适配 **DSH 0.2.2-rc.1**（0.2.1-rc.2 / rc.5、0.2.0 仍可用）。**不支持 DSH 0.2.1-rc.3 / rc.4。** 官方 **Web**（`dsh web`）和官方 **桌面端**（EXE）都支持，两边分开装、分开应用。
+**dsh-purge** 是装在本机官方 [DeepSeek Harness](https://www.deepseek.com/harness/) 上的网络安全红队评测插件。当前 **1.1.94** 已适配 **DSH 0.2.2-rc.1**（0.2.1-rc.2 / rc.5、0.2.0 仍可用）。**不支持 DSH 0.2.1-rc.3 / rc.4。** 官方 **Web**（`dsh web`）和官方 **桌面端**（EXE）都支持，两边分开装、分开应用。
 
 Harness 不只是把问题交给模型。它还会在运行时改提示词、审批门、沙箱和会话格式。只看「模型答不答」，会把宿主拦截误当成模型拒绝。这个插件在你自己的安装里把这两层分开，用来做受控评测，也用来看默认策略该不该收紧。
 
@@ -104,13 +104,15 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 **原版禁止倒卖。** 不得付费转售、换皮上架，或以商品形式分销。
 
-**二开必须署名**，并写明来源仓库：[wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-)。借用本项目的名称、思路、代码或提示词，同样必须署名。
+**二开必须署名**，并写明来源仓库：[wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge)。借用本项目的名称、思路、代码或提示词，同样必须署名。
+
+**上游来源。** 本项目源自 **YuJunZhiXue** 的 dsh-purge。原仓库已从 GitHub 移除，完整历史归档在 [mmparko/dsh-purge](https://github.com/mmparko/dsh-purge)（MIT 许可证镜像，至 v1.1.71），Apache-2.0 的版本线延续在 [yu994419160/dsh-purge1.7.3-](https://github.com/yu994419160/dsh-purge1.7.3-)。再分发本项目或其衍生作品时，必须保留版权声明与 [NOTICE](./NOTICE)，并写明上述来源。
 
 不署名、隐瞒来源、改头换面据为己有，或把原版拿去倒卖，维护团队将依法追究责任。
 
 ## 许可证
 
-本仓库使用 [Apache License 2.0](./LICENSE)。二开、再分发必须保留版权声明和 [NOTICE](./NOTICE)，写明来源 [wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-)。原版禁止倒卖。
+本仓库使用 [Apache License 2.0](./LICENSE)。二开、再分发必须保留版权声明和 [NOTICE](./NOTICE)，写明来源 [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge) 以及 NOTICE 中记录的上游来源。原版禁止倒卖。
 
 ---
 
@@ -153,12 +155,12 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 ## 适配范围
 
-**1.1.93 及更高版本适配 DSH 0.2.2-rc.1**，0.2.1-rc.2 / rc.5、0.2.0 仍可用。不要拿它去打 0.1.x。
+**1.1.94 及更高版本适配 DSH 0.2.2-rc.1**，0.2.1-rc.2 / rc.5、0.2.0 仍可用。不要拿它去打 0.1.x。
 
 - **dsh 0.2.1-rc.2**（官方桌面 / 官方 `dsh web`）：用 **1.1.81** 或更高。已修 `{{cwd}}` / `[cwd]` 整轮失败、补丁 #40 命中、`toolFilter` 废弃、`dsh-tools` 解析、hostFs fd、桌面换包自杀、`file:` 归档更新、Ctrl+Enter 插话。
-- **dsh 0.2.2-rc.1**（官方桌面 / 官方 `dsh web`）：用 **1.1.93** 或更高。补齐 0.2.2 的 pattern 集 —— 审批问句新文案、沙箱升级 `displayReason`、观察意图、assemble 多出的 `tools` 字段，以及交付物 / run_code / 审批的目标文件搬家。
+- **dsh 0.2.2-rc.1**（官方桌面 / 官方 `dsh web`）：用 **1.1.94** 或更高。补齐 0.2.2 的 pattern 集 —— 审批问句新文案、沙箱升级 `displayReason`、观察意图、assemble 多出的 `tools` 字段，以及交付物 / run_code / 审批的目标文件搬家。
 - **dsh 0.2.0-rc.2**：用 **1.1.40** 及以上；本页这档也能装。
-- **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/wuyan1668/dsh-purge-/releases) 里选对应标签。
+- **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/wuyan1668/dsh-purge/releases) 里选对应标签。
 - **不支持 dsh 0.2.1-rc.3 / rc.4。** 宿主对不上时补丁会显示待应用或跳过，不会乱改文件。请用 **0.2.2-rc.1**，或退回 **0.2.1-rc.2**。
 
 对不上的补丁会显示待应用或跳过，不会乱改文件。
@@ -175,10 +177,10 @@ PATH 里有 `dsh`？一条命令、一次重启、一次点击。跑你正在打
 
 ```sh
 # 官方 `dsh web`
-dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 
 # 官方桌面 EXE
-dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 1. **完全退出再打开**刚装的那个宿主。Web：停掉 `dsh web` 再开。桌面：托盘也要退出，再开 exe。
@@ -203,14 +205,14 @@ dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge
 
 ```sh
 cd "$DSH_HOME/profiles/web"    # 桌面改 profiles/desktop
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 Windows PowerShell：
 
 ```powershell
 cd "$env:USERPROFILE\.dsh\profiles\web"   # 桌面改 profiles\desktop
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 `pnpm add` 和 `dsh plugin add` 都会拉包；`postinstall` 再把 `dsh-purge` 写进 `dsh.profile.bundles`，并在 profile 的 `cordis.patch.yml` 补上本体 `insert`（没有这一行，宿主不加载插件，界面也没有按钮）。
@@ -220,9 +222,9 @@ pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/mast
 - pnpm 11/12 默认拦安装脚本（`ERR_PNPM_IGNORED_BUILDS`），要带上允许构建：
 
 ```sh
-pnpm add --allow-build=dsh-purge --allow-build=dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add --allow-build=dsh-purge --allow-build=dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 # 已经装上但只有警告时，必须带完整 specifier（只写 dsh-purge 会留下 set this to true or false）：
-pnpm approve-builds dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm approve-builds dsh-purge@https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 # bundles / insert 还没写上时再补：
 node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
 ```
@@ -231,7 +233,7 @@ node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
 - 桌面客户端也可以点按钮（`dsh://` 唤起，下的仍是同一份压缩包）。
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.92&repo=wuyan1668%2Fdsh-purge-&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fcodeload.github.com%2Fwuyan1668%2Fdsh-purge-%2Ftar.gz%2Frefs%2Fheads%2Fmaster"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.94&repo=wuyan1668%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fcodeload.github.com%2Fwuyan1668%2Fdsh-purge%2Ftar.gz%2Frefs%2Fheads%2Fmaster"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 **第 3 步 —— 重启宿主。** 只把插件写进 profile **还不会**改 `@deepseek-ai`。完全退出再打开刚装的那个宿主（Web：停掉 `dsh web` 再开；桌面：托盘也要退出，再开 exe）。
@@ -249,7 +251,7 @@ node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
 
 ```sh
 dsh plugin --profile desktop remove dsh-purge
-dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 只有 pnpm 时：
@@ -257,7 +259,7 @@ dsh plugin --profile desktop add https://codeload.github.com/wuyan1668/dsh-purge
 ```sh
 cd "$DSH_HOME/profiles/desktop"
 pnpm remove dsh-purge
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 Web 端把 `desktop` 换成 `web`。
@@ -278,13 +280,13 @@ Web 端把 `desktop` 换成 `web`。
 有 `dsh`：
 
 ```sh
-dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 没有 `dsh`、只有 pnpm：找到 `$DSH_HOME/profiles/web`（常见 `~/.dsh/profiles/web`），在该目录执行：
 
 ```sh
-pnpm add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master
+pnpm add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master
 ```
 
 当前目录已是本仓库且有 `dsh` 时改用 `dsh plugin --profile web add .`。`dsh` 和 pnpm 都没有再告诉用户后停止。
@@ -322,10 +324,10 @@ $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_
 **2. 把插件放到 `$DSH_HOME/plugins/dsh-purge`**（目录名必须是 `dsh-purge`，其 `package.json` 里 `"name"` 也必须是 `dsh-purge`）。
 
 ```sh
-git clone https://github.com/wuyan1668/dsh-purge-.git "$DSH_HOME/plugins/dsh-purge"
+git clone https://github.com/wuyan1668/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
 ```
 
-没有 git：下载 [master.tar.gz](https://github.com/wuyan1668/dsh-purge-/archive/refs/heads/master.tar.gz)，解压后把 `dsh-purge-master` 改名为 `dsh-purge`，整夹放到 `plugins` 下。已有本仓库副本就复制整个目录，不要只拷几个 `.js`。
+没有 git：下载 [master.tar.gz](https://github.com/wuyan1668/dsh-purge/archive/refs/heads/master.tar.gz)，解压后把 `dsh-purge-master` 改名为 `dsh-purge`，整夹放到 `plugins` 下。已有本仓库副本就复制整个目录，不要只拷几个 `.js`。
 
 **3. 只改对应 profile 的 `package.json`，先备份。** Web → `$DSH_HOME/profiles/web/package.json`；桌面 → `$DSH_HOME/profiles/desktop/package.json`。**只追加两处**，原有依赖和 bundle 全部留着：
 
@@ -610,14 +612,14 @@ flowchart TD
 
 ## 更新
 
-团队频道：[t.me/LLM_PoJia](https://t.me/LLM_PoJia)，用于发布通知与更新。GitHub [Releases](https://github.com/wuyan1668/dsh-purge-/releases) 仍可下载历史包。原版不允许倒卖；二开必须署名并注明来源，第三方二开与原作者及本团队无关。
+团队频道：[t.me/LLM_PoJia](https://t.me/LLM_PoJia)，用于发布通知与更新。GitHub [Releases](https://github.com/wuyan1668/dsh-purge/releases) 仍可下载历史包。原版不允许倒卖；二开必须署名并注明来源，第三方二开与原作者及本团队无关。
 
 ## 说明
 
 - 改动范围是本机 `@deepseek-ai/*` 包里的渲染文案、默认策略和执行逻辑，以及用户目录下的覆盖文件与规则集。
 - 升级后原文对不上会显示跳过，这次应用仍算完成，不会乱改。
 - 不改动非 `@deepseek-ai` 的第三方插件源仓库（启动时的 CMD 无感会**尽力**修补已装的 doctor / market / 梁神 / mnemon，属运行时补丁）。
-- 安装走 GitHub 压缩包（npm 仓库没有这个名字，也不要走插件市场）。有 `dsh`：`dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge-/tar.gz/refs/heads/master`。只有 pnpm：在 `$DSH_HOME/profiles/web` 里 `pnpm add` 同一地址。桌面把 `web` 换成 `desktop`。当前目录已是本仓库时 `add .`。
+- 安装走 GitHub 压缩包（npm 仓库没有这个名字，也不要走插件市场）。有 `dsh`：`dsh plugin --profile web add https://codeload.github.com/wuyan1668/dsh-purge/tar.gz/refs/heads/master`。只有 pnpm：在 `$DSH_HOME/profiles/web` 里 `pnpm add` 同一地址。桌面把 `web` 换成 `desktop`。当前目录已是本仓库时 `add .`。
 
 ---
 

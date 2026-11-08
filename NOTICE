@@ -1,10 +1,22 @@
 dsh-purge
+Copyright 2026 YuJunZhiXue
 Copyright 2026 HunYiSage
+Copyright 2026 wuyan1668
 
-Source: https://github.com/HunYiSage/dsh-purge
-Current maintenance: https://github.com/wuyan1668/dsh-purge-
+Original source: https://github.com/YuJunZhiXue/dsh-purge
+  That repository has been removed from GitHub and is no longer reachable.
+  Its full history is archived at https://github.com/mmparko/dsh-purge
+  (MIT-licensed mirror of the original, up to v1.1.71), and the Apache-2.0
+  release line continues at https://github.com/yu994419160/dsh-purge1.7.3-.
+
+Current maintenance: https://github.com/wuyan1668/dsh-purge
+  Maintained by wuyan1668. All upstream commits, issues and releases are
+  preserved; the original author's credit and source record are retained.
 
 This product is licensed under the Apache License, Version 2.0.
 Derivative works must retain this NOTICE and attribution.
 
-Bundled skills under skills/redteam/ originate from the dsh-purge upstream project (YuJunZhiXue/dsh-purge), retrieved via the mirror mmparko/dsh-purge.
+Bundled skills under skills/redteam/ originate from the dsh-purge upstream project
+(YuJunZhiXue/dsh-purge, MIT-licensed at the time of retrieval), retrieved via the
+mirror https://github.com/mmparko/dsh-purge. They are bundled unchanged and are
+credited here as required by the upstream attribution terms.

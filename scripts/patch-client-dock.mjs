@@ -124,6 +124,8 @@ if (!client.includes(".dshp-dock{")) {
 .dshp-icon-btn.on,.dshp-icon-btn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,currentColor)}
 .dshp-hbtn{appearance:none;border:0;background:transparent;color:var(--dsw-alias-label-secondary,currentColor);cursor:pointer;font:12px/1 inherit;padding:4px 8px;border-radius:8px}
 .dshp-hbtn.on,.dshp-hbtn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,currentColor)}
+.dshp-full-host{position:fixed;inset:0;z-index:60;pointer-events:none}
+.dshp-full-host .rt-full{pointer-events:auto}
 `;
 	// Find end of PURGE_CSS - the backtick after Rewind starts at REWIND_CSS
 	const purgeCssEnd = client.indexOf("\t\tconst REWIND_CSS");
@@ -288,11 +290,30 @@ const dockBlock = `
 				try { if (__dshPurgeDrill.setDockWidth) __dshPurgeDrill.setDockWidth(620); } catch { /* ignore */ }
 				return () => { styleTag.remove(); widthTag.remove(); };
 			}, []);
+			/* 全面浏览独立窗口（URL 带 #redteam-full）：只挂演练台本体，不画 dock 外框。 */
+			const fullWindow = !!(__dshPurgeDrill && __dshPurgeDrill.isFullWindow && __dshPurgeDrill.isFullWindow());
 			useEffect(() => {
 				if (st.tab === "drill" && readDrillAuth() && __dshPurgeDrill && __dshPurgeDrill.setUI) {
 					try { __dshPurgeDrill.setUI({ open: true }); } catch { /* ignore */ }
 				}
 			}, [st.tab, st.open]);
+			useEffect(() => {
+				if (!fullWindow) return;
+				if (!readDrillAuth()) {
+					setDock({ open: true, tab: "drill", authOpen: true, pending: "tab" });
+					return;
+				}
+				try { if (__dshPurgeDrill && __dshPurgeDrill.setUI) __dshPurgeDrill.setUI({ open: true }); } catch { /* ignore */ }
+			}, [fullWindow]);
+			if (fullWindow) {
+				const fullBody = (readDrillAuth() && __dshPurgeDrill && __dshPurgeDrill.Panel)
+					? h(__dshPurgeDrill.Panel, null)
+					: h("div", { style: { padding: 16, color: "var(--dsw-alias-label-secondary)" } }, t("dock.unauthorized"));
+				return h(react.Fragment, null,
+					h("div", { className: "dshp-full-host" }, fullBody),
+					st.authOpen ? h(AuthGate, { pending: "tab" }) : null,
+				);
+			}
 			const onTab = (id) => {
 				if (id === "drill") { requestDrill("tab"); return; }
 				setDock({ tab: "clean", authOpen: false, pending: "tab" });
@@ -418,6 +439,98 @@ const newApply = `		function apply(ctx) {
 			}, () => h(react.Fragment, null, h(PurgeDock), h(HeroNewSessionMount), h(TabRowPurgeMount), h(EnvAdaptSendGate))));
 			try {
 				if (typeof ctx.inject === "function") {
+					for (const dep of REWIND_DEPS) {
+						try { ctx.inject([dep], (host) => installRewindUi(host)); } catch (e) { /* ignore */ }
+					}
+				} else if (ctx.sessions) {
+					installRewindUi(ctx);
+				}
+			} catch (e) {
+				try { console.warn("[dsh-purge] rewind ui skipped:", e); } catch { /* ignore */ }
+			}
+		}`;
+
+if (client.includes('id: "dsh-purge-dock"')) {
+	// already patched apply
+} else if (client.includes(oldApply)) {
+	client = client.replace(oldApply, newApply);
+} else {
+	throw new Error("apply() block not found for replacement");
+}
+
+// ---------------------------------------------------------------------------
+// 4b) Repairs. Idempotent: running this script twice must not change the file
+//     again. They exist so an already-patched client.js converges onto the
+//     same shape as a freshly patched one.
+// ---------------------------------------------------------------------------
+
+// 4b-1) Repository URL: the old slug carried a trailing dash (a rename
+//      artifact). The canonical repository is `wuyan1668/dsh-purge`.
+client = client.replace(/github\.com\/wuyan1668\/dsh-purge-(?![\w-])/g, "github.com/wuyan1668/dsh-purge");
+client = client.replace(/wuyan1668\/dsh-purge-(?![\w-])/g, "wuyan1668/dsh-purge");
+
+// 4b-2) The rewind UI used to wait for four host services, but only three of
+//      them are ever read. `workspaces` was a dead hard dependency: cordis's
+//      inject never fires while one dependency is missing, so a profile
+//      without that service silently lost the whole rewind surface.
+if (!client.includes("const REWIND_DEPS =")) {
+	const depAnchor = "\t\tlet rewindConversation = null;";
+	if (!client.includes(depAnchor)) throw new Error("rewindConversation declaration not found");
+	client = client.replace(depAnchor, depAnchor + `
+		let rewindWatchInstalled = false;
+
+		/*
+		 * 从 ctx 链上取一个宿主服务。
+		 * cordis 的 ctx.get() 会沿 isolate 链往上找，所以子 ctx（inject 出来的）
+		 * 也能拿到根 ctx 上提供的服务——这让三个依赖可以各自独立注入。
+		 */
+		function serviceOf(ctx, name) {
+			try {
+				if (!ctx) return undefined;
+				if (typeof ctx.get === "function") return ctx.get(name);
+				return ctx[name];
+			} catch { return undefined; }
+		}
+
+		/*
+		 * 回退面板真正读到的宿主服务只有三个：sessions / uiWorkspace / conversation。
+		 *
+		 * 旧写法把 "workspaces" 也挂进 inject，而插件从头到尾没读过它——
+		 * cordis 的 inject 只要有一个依赖缺席，回调就永远不触发，回退按钮、
+		 * 回退监视、composer 补写会静默地一个都不装。
+		 *
+		 * 现在三个服务各自独立注入：少一个，其余两个照样装上。
+		 */
+		const REWIND_DEPS = ["sessions", "uiWorkspace", "conversation"];`);
+}
+
+const oldWatch = `		function installRewindWatch(ctx) {
+			const sessions = ctx.sessions;`;
+if (client.includes(oldWatch)) {
+	client = client.replace(oldWatch, `		function installRewindWatch(ctx) {
+			const sessions = (ctx && ctx.sessions) || rewindSessions;`);
+}
+
+const oldInstall = `		function installRewindUi(ctx) {
+			rewindHost = ctx;
+			rewindSessions = ctx.sessions;
+			rewindWorkspace = ctx.uiWorkspace || null;
+			rewindConversation = ctx.conversation || null;
+			ctx.effect(() => installRewindWatch(ctx), "dsh-purge: rewind watch");
+		}`;
+const newInstall = `		function installRewindUi(ctx) {
+			rewindHost = ctx;
+			rewindSessions = serviceOf(ctx, "sessions") || rewindSessions;
+			rewindWorkspace = serviceOf(ctx, "uiWorkspace") || rewindWorkspace;
+			rewindConversation = serviceOf(ctx, "conversation") || rewindConversation;
+			if (rewindWatchInstalled) return;
+			rewindWatchInstalled = true;
+			ctx.effect(() => installRewindWatch(ctx), "dsh-purge: rewind watch");
+		}`;
+if (client.includes(oldInstall)) client = client.replace(oldInstall, newInstall);
+
+const oldInjectBlock = `			try {
+				if (typeof ctx.inject === "function") {
 					ctx.inject(["sessions", "uiWorkspace", "workspaces", "conversation"], (host) => installRewindUi(host));
 				} else if (ctx.sessions) {
 					installRewindUi(ctx);
@@ -430,15 +543,36 @@ const newApply = `		function apply(ctx) {
 				} catch (e2) {
 					try { console.warn("[dsh-purge] rewind ui skipped:", e2 || e); } catch { /* ignore */ }
 				}
-			}
-		}`;
+			}`;
+const newInjectBlock = `			try {
+				if (typeof ctx.inject === "function") {
+					for (const dep of REWIND_DEPS) {
+						try { ctx.inject([dep], (host) => installRewindUi(host)); } catch (e) { /* ignore */ }
+					}
+				} else if (ctx.sessions) {
+					installRewindUi(ctx);
+				}
+			} catch (e) {
+				try { console.warn("[dsh-purge] rewind ui skipped:", e); } catch { /* ignore */ }
+			}`;
+if (client.includes(oldInjectBlock)) client = client.replace(oldInjectBlock, newInjectBlock);
 
-if (client.includes('id: "dsh-purge-dock"')) {
-	// already patched apply
-} else if (client.includes(oldApply)) {
-	client = client.replace(oldApply, newApply);
-} else {
-	throw new Error("apply() block not found for replacement");
+// 4b-3) The conversation definition was registered without keeping its
+//      disposer, so unloading the plugin left an orphan definition behind.
+const oldRegister = "\t\t\t\tctx.uiConversation.events.register(purgeCommandInputDefinition);";
+if (client.includes(oldRegister)) {
+	client = client.replace(oldRegister, "\t\t\t\tctx.effect(() => ctx.uiConversation.events.register(purgeCommandInputDefinition), \"dsh-purge: command input definition\");");
+}
+
+// 4b-4) Full-view host wrapper styles (the .rt-full shell lives in the drill
+//      stylesheet; the wrapper itself stays inert).
+if (!client.includes(".dshp-full-host{")) {
+	const cssAnchor = ".dshp-launch{font-size:13px!important;line-height:1!important;font-weight:600!important;min-width:max-content!important}";
+	if (client.includes(cssAnchor)) {
+		client = client.replace(cssAnchor, cssAnchor + `
+.dshp-full-host{position:fixed;inset:0;z-index:60;pointer-events:none}
+.dshp-full-host .rt-full{pointer-events:auto}`);
+	}
 }
 
 writeFileSync(clientPath, client);

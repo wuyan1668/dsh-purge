@@ -1,4 +1,4 @@
-> **本 fork 说明**：本仓库现由 `wuyan1668/dsh-purge-` 维护，与上游的授权关系与历史来源见 [NOTICE](./NOTICE)。
+> **本仓库说明**：本仓库现由 `wuyan1668/dsh-purge` 维护，与上游的授权关系与历史来源见 [NOTICE](./NOTICE)。
 > 需要商业授权、或者持有上游历史授权的，请联系维护团队频道 [t.me/LLM_PoJia](https://t.me/LLM_PoJia)。
 
 # 怎么谈商业授权
@@ -8,7 +8,7 @@
 你个人本机自用：不另外收费，遵守 LICENSE 即可。
 你拿去卖、卖课、白标、给第三方当产品：先联系维护团队。
 
-通过项目仓库 [wuyan1668/dsh-purge-](https://github.com/wuyan1668/dsh-purge-) 或团队频道 [t.me/LLM_PoJia](https://t.me/LLM_PoJia) 联系。
+通过项目仓库 [wuyan1668/dsh-purge](https://github.com/wuyan1668/dsh-purge) 或团队频道 [t.me/LLM_PoJia](https://t.me/LLM_PoJia) 联系。
 注明 `dsh-purge 商业许可`，写清用途、是否再分发、大致规模。没有自动收银台，谈妥再签。
 
 授权不转让项目名称，也不让你对外自称官方。
