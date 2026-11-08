@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.1.92</strong></p>
+<p align="center"><strong>Version 1.1.93</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness jailbreak: every model, swap prompts per model. Default prompt for 小码酱. Please star ⭐ If you build on this, see Attribution required.</em>
@@ -78,7 +78,7 @@ Official channels: this repository's [Issues](https://github.com/wuyan1668/dsh-p
 
 ## What this is
 
-**dsh-purge** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine. **1.1.92** targets **DSH 0.2.1-rc.2** (0.2.0 still works). **DSH 0.2.1-rc.3 and newer RCs are not supported.** Official **Web** (`dsh web`) and the official **desktop EXE** are both supported. Install and Apply them separately.
+**dsh-purge** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine. **1.1.93** targets **DSH 0.2.2-rc.1** (0.2.1-rc.2 / rc.5 and 0.2.0 still work). **DSH 0.2.1-rc.3 / rc.4 are not supported.** Official **Web** (`dsh web`) and the official **desktop EXE** are both supported. Install and Apply them separately.
 
 Harness does more than forward a prompt. It rewrites prompts, approval gates, sandbox policy, and session migration at runtime. Asking only “will the model answer” treats a host-layer block as a model refusal. This plugin separates those two layers on your own install, for controlled evaluation and for seeing which default policy is too tight.
 
@@ -151,12 +151,13 @@ This repo is [Apache License 2.0](./LICENSE). Forks and redistributions must kee
 
 ## Supported hosts
 
-**1.1.81 and newer target DSH 0.2.1-rc.2.** 0.2.0 still works. Do not apply it to 0.1.x.
+**1.1.93 and newer target DSH 0.2.2-rc.1.** 0.2.1-rc.2 / rc.5 and 0.2.0 still work. Do not apply it to 0.1.x.
 
+- **dsh 0.2.2-rc.1** (official desktop / official `dsh web`): use **1.1.93** or newer. Adds the 0.2.2 pattern set — approval ask sentence, sandbox escalation `displayReason`, observation intent, the extra `tools` field in assemble, and the deliverable / run-code / approval target moves.
 - **dsh 0.2.1-rc.2** (official desktop / official `dsh web`): use **1.1.81** or newer. Fixes `{{cwd}}` / `[cwd]` crash, patch #40 match, dropped `toolFilter`, host `dsh-tools` resolve, hostFs fd, desktop helper self-kill, `file:` archive update, Ctrl+Enter steer.
 - **dsh 0.2.0-rc.2**: use **1.1.40** or newer; this line also installs.
 - **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/wuyan1668/dsh-purge-/releases).
-- **dsh 0.2.1-rc.3 / rc.4 and newer are not supported.** Unmatched patches stay pending or skipped; nothing is rewritten blindly. Stay on **0.2.1-rc.2**.
+- **dsh 0.2.1-rc.3 / rc.4 are not supported.** Unmatched patches stay pending or skipped; nothing is rewritten blindly. Stay on **0.2.2-rc.1** or **0.2.1-rc.2**.
 
 Unmatched patches stay pending or skipped; nothing is rewritten blindly.
 

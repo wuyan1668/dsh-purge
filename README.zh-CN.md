@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.1.92</strong></p>
+<p align="center"><strong>Version 1.1.93</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分</em>
@@ -78,7 +78,7 @@ dsh-purge 最初由原作者独立开发。项目现已由 **dsh-purge 维护团
 
 ## 介绍
 
-**dsh-purge** 是装在本机官方 [DeepSeek Harness](https://www.deepseek.com/harness/) 上的网络安全红队评测插件。当前 **1.1.92** 已适配 **DSH 0.2.1-rc.2**（0.2.0 仍可用）。**不支持 DSH 0.2.1-rc.3 及更新的 rc。** 官方 **Web**（`dsh web`）和官方 **桌面端**（EXE）都支持，两边分开装、分开应用。
+**dsh-purge** 是装在本机官方 [DeepSeek Harness](https://www.deepseek.com/harness/) 上的网络安全红队评测插件。当前 **1.1.93** 已适配 **DSH 0.2.2-rc.1**（0.2.1-rc.2 / rc.5、0.2.0 仍可用）。**不支持 DSH 0.2.1-rc.3 / rc.4。** 官方 **Web**（`dsh web`）和官方 **桌面端**（EXE）都支持，两边分开装、分开应用。
 
 Harness 不只是把问题交给模型。它还会在运行时改提示词、审批门、沙箱和会话格式。只看「模型答不答」，会把宿主拦截误当成模型拒绝。这个插件在你自己的安装里把这两层分开，用来做受控评测，也用来看默认策略该不该收紧。
 
@@ -153,12 +153,13 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 ## 适配范围
 
-**1.1.81 及更高版本适配 DSH 0.2.1-rc.2**，0.2.0 仍可用。不要拿它去打 0.1.x。
+**1.1.93 及更高版本适配 DSH 0.2.2-rc.1**，0.2.1-rc.2 / rc.5、0.2.0 仍可用。不要拿它去打 0.1.x。
 
 - **dsh 0.2.1-rc.2**（官方桌面 / 官方 `dsh web`）：用 **1.1.81** 或更高。已修 `{{cwd}}` / `[cwd]` 整轮失败、补丁 #40 命中、`toolFilter` 废弃、`dsh-tools` 解析、hostFs fd、桌面换包自杀、`file:` 归档更新、Ctrl+Enter 插话。
+- **dsh 0.2.2-rc.1**（官方桌面 / 官方 `dsh web`）：用 **1.1.93** 或更高。补齐 0.2.2 的 pattern 集 —— 审批问句新文案、沙箱升级 `displayReason`、观察意图、assemble 多出的 `tools` 字段，以及交付物 / run_code / 审批的目标文件搬家。
 - **dsh 0.2.0-rc.2**：用 **1.1.40** 及以上；本页这档也能装。
 - **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/wuyan1668/dsh-purge-/releases) 里选对应标签。
-- **不支持 dsh 0.2.1-rc.3 / rc.4 及更新。** 宿主对不上时补丁会显示待应用或跳过，不会乱改文件。请退回 **0.2.1-rc.2** 再用本插件。
+- **不支持 dsh 0.2.1-rc.3 / rc.4。** 宿主对不上时补丁会显示待应用或跳过，不会乱改文件。请用 **0.2.2-rc.1**，或退回 **0.2.1-rc.2**。
 
 对不上的补丁会显示待应用或跳过，不会乱改文件。
 

@@ -1,3 +1,24 @@
+# 1.1.93
+
+## 中文
+
+- 版本 **1.1.93**。
+- **适配 DSH 0.2.2-rc.1**（当前 npm 上 @deepseek-ai/dsh-base 的最新版）：9 条 0.2.2 特有回归全部修复 —— #12 审批问句新文案、#14 沙箱升级的 `displayReason` 第三代形态、#17 `requirePresent` 抽取、#40 assemble 多出 `tools` 字段、#54 交付物拆独立包、#60 run_code 执行器拆独立包、#62 审批逻辑搬进 `pipeline.js` 且 `undefined` 改写成 `void 0`、#67 缩进 4 TAB 变 5 TAB、#74 assemble 前插入模型与工具集解析。
+- **目标文件跟着上游搬**：#54 / #60 / #62 的目标分别改到 `dsh-deliverable-file-references`、`dsh-tool-executor-ptc`、`dsh-tools/lib/pipeline.js`；`targetFiles()` 补齐 4 个 0.2.2 新包键。
+- **修掉一类「绿色的假象」**：#12 原先落在 layout-soft 白名单里 —— 官方文案换了、补丁一条都没中，状态页却显示 applied。已把它移出白名单，真失参会老实报 drifted，不再假装已完成。
+- **双宿主对照实测**：DSH 0.2.1-rc.2 与 0.2.2-rc.1 上插件自身的补丁判定完全一致（pending 66 / applied 4 / drifted 1 / na 14 / skipped 1），旧版本宿主零退化。
+- **版本门禁**：`dshTarget` 指向 `0.2.2-rc.1`，`dshTargets` 保留 `0.2.1-rc.5` 与 `0.2.1-rc.2`。
+- **测量入口**：导出 `patchReplacements()`，外部可用插件自己的归一化逻辑复现命中测量。
+
+## English
+
+- **1.1.93**.
+- **DSH 0.2.2-rc.1 support** (the current npm latest of @deepseek-ai/dsh-base): all 9 version-specific regressions fixed — #12 approval ask sentence, #14 sandbox escalation `displayReason`, #17 `requirePresent` extraction, #40 the extra `tools` field in assemble, #54 deliverable split, #60 run_code executor split, #62 approval moved into `pipeline.js` with `undefined` rewritten as `void 0`, #67 indent 4 TAB to 5 TAB, #74 model/tool-set resolution before assemble.
+- **Targets follow the upstream move**: #54 / #60 / #62 now point at `dsh-deliverable-file-references`, `dsh-tool-executor-ptc` and `dsh-tools/lib/pipeline.js`; `targetFiles()` gained the four new 0.2.2 package keys.
+- **A class of green lies fixed**: #12 sat in the layout-soft allowlist — the official wording changed, no pattern matched, yet the status page showed applied. It is out of the allowlist now, so a real mismatch reports drifted instead of pretending to be done.
+- **Measured on both hosts**: the plugin's own patch verdict is identical on DSH 0.2.1-rc.2 and 0.2.2-rc.1 (pending 66 / applied 4 / drifted 1 / na 14 / skipped 1) — zero regression on the older host.
+- **Version gate**: `dshTarget` is now `0.2.2-rc.1`, with `0.2.1-rc.5` and `0.2.1-rc.2` kept in `dshTargets`.
+- **Measurement hook**: `patchReplacements()` is exported so the plugin's own normalization can be reused to reproduce hit measurements.
 # 1.1.92
 
 ## 中文
