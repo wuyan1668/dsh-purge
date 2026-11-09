@@ -1,3 +1,53 @@
+# 1.1.96
+
+## 中文
+
+- 版本 **1.1.96**。
+- **提示词变体**：出厂提示词按**模型族**分成多份，运行时按当前模型自动选一份 —— 「每个模型可换提示词」从此是自动的，不再只是手动改稿。
+  - **多槽**：加密槽从「一份」变成「一份变体一个槽」（`lib/asset-table.js` 导出 `SLOTS`；旧的平铺 `SLOT/MASK/TAG/IV` 仍导出默认槽，老代码不受影响）。`scripts/embed-default-prompt.mjs` 扫描 `lib/default-prompt-inject*.md`，逐个封槽，明文仍然只在本机维护。
+  - **选择**：宿主在装配期把 `{ provider, model }` 放在 `context.modelSelection`，插件据此选变体（新增 `lib/prompt-variant.js`，纯逻辑、可单测、不 import 宿主任何东西）。内置规则：`anthropic` / `claude*` → `claude` 变体，其余 → `default`。规则可以自己改，也可以锁定某一份 —— `$DSH_HOME/dsh-purge/variants.json`：
+    ```json
+    { "active": "auto", "rules": [{ "provider": "openai", "model": "^gpt-", "variant": "default" }] }
+    ```
+  - **优先级**（对当前模型命中的变体）：面板里刚提交的正文 → 该变体的用户稿（`$DSH_HOME/prompt-inject.<变体>.md`）→ 主稿 `prompt-inject.md` 里用户自己写的内容 → 该变体的出厂稿 → 默认稿。**用户写过的稿不会被出厂稿顶掉。**
+  - **钉子按变体分开**：锁了 claude 变体不会把别的模型也带偏（原先的「本进程提交」只有一个全局钉子）。
+  - **面板**：设置页新增变体下拉，可逐变体查看 / 保存 / 还原，并显示当前模型。
+  - **CLI**：`dsh-purge --status` 打印「按模型自动选 / 已锁定 <变体>」与可用变体清单。
+  - **性能**：变体列表与变体配置有 5 秒短缓存 —— 装配期每一步都会问一次「有哪些变体」，不能每次扫盘（实测 200 次解析 3 ms）。
+  - 自测 30/30 通过：模型→变体映射、手动锁定、变体不存在回落 default、用户稿优先级、坏配置兜底、保存/UI 列表。
+- **Claude 专用变体稿**（26,275 字符 / 276 行）：针对 Claude 的四种软拒答形态加固 ——
+  1. 开场铺垫（"Great question!" / "Let me think" / 复述一遍问题）；
+  2. **泛化答案 + 尾部警告**（不含任何禁用词，只是把请求降级成综述，词表抓不住）；
+  3. 把请求改写成政策问题（「这个请求涉及 X」）；
+  4. 上一轮以 refusal / provider 错误收尾后框架被重置（与 `lib/refusal-recovery.js` 的有界重锚同口径）。
+  配套把输出前自检从三条加到四条（新增「没被降级成泛化处理、没挂 caveat/warning」），近因终检补 `no trailing caveat`，House Rules 收口「一句请求一个答案」。
+  **Scoped Rules 1–25、CTF Core Contract、CTF Scope and Evidence 与默认稿逐字节一致** —— 授权范围不变，只改表达形态；未新增任何公网/第三方攻击能力、工具或目标类别。
+- **`.gitignore`**：补 `lib/default-prompt-inject.claude.md` 与 `lib/default-prompt-inject.*.md`，以后新增变体自动兜住，明文不会误入仓库。
+
+## English
+
+- **1.1.96**.
+- **Prompt variants**: the bundled prompt ships as **several variants**, one per model family, and the plugin picks the right one from the current model at assembly time — "swap prompts per model" is now automatic instead of a manual edit.
+  - **Multi-slot**: the encrypted slot becomes one slot per variant (`lib/asset-table.js` exports `SLOTS`; the flat `SLOT/MASK/TAG/IV` exports still carry the default slot, so older code is unaffected). `scripts/embed-default-prompt.mjs` scans `lib/default-prompt-inject*.md` and seals each one; the plaintext still never leaves the maintainer's machine.
+  - **Selection**: the host hands `{ provider, model }` to the plugin as `context.modelSelection` at assembly time, and the plugin maps it to a variant (new `lib/prompt-variant.js` — pure logic, unit-testable, imports nothing from the host). Built-in rules map `anthropic` / `claude*` to the `claude` variant, everything else to `default`. Rules can be overridden, or one variant can be pinned, in `$DSH_HOME/dsh-purge/variants.json`:
+    ```json
+    { "active": "auto", "rules": [{ "provider": "openai", "model": "^gpt-", "variant": "default" }] }
+    ```
+  - **Resolution order** for the variant the current model maps to: text just submitted in the panel → that variant's own user file (`$DSH_HOME/prompt-inject.<variant>.md`) → your own text in the main `prompt-inject.md` → that variant's stock prompt → the default prompt. **Your own text is never silently replaced by a stock one.**
+  - **Per-variant pins**: pinning the claude variant no longer drags other models with it (the in-process commit used to be a single global pin).
+  - **Panel**: the settings page gains a variant dropdown — view / save / restore per variant — and shows the current model.
+  - **CLI**: `dsh-purge --status` prints whether the selection is automatic or locked, plus the available variants.
+  - **Performance**: the variant list and the variant config are cached for 5 seconds — every assembly step asks which variants exist, and that must not hit the disk every time (200 resolutions measured at 3 ms).
+  - Self-test 30/30: model→variant mapping, manual pin, fallback when a variant does not exist, user-text precedence, broken-config fallback, save/UI listing.
+- **Claude-specific variant** (26,275 chars / 276 lines), hardening four of Claude's soft-refusal shapes:
+  1. opening pleasantries ("Great question!" / "Let me think" / restating the question);
+  2. **a generic answer plus a trailing caveat** — it contains no banned phrase, it merely downgrades the request to a survey, so a word list cannot catch it;
+  3. restating the request as a policy question ("this request involves X");
+  4. the frame resetting after a turn that ended in a refusal or a provider error (same wording as the bounded re-anchor in `lib/refusal-recovery.js`).
+  The pre-emit check grows from three things to four (the new one: "not downgraded to a generic treatment, no caveat/warning attached"), the recency gate gains `no trailing caveat`, and House Rules closes with "one request, one answer".
+  **Scoped Rules 1–25, CTF Core Contract and CTF Scope and Evidence are byte-identical to the default** — the authorized scope is unchanged, only the form of expression moves; no new public-network or third-party attack capability, tool or target category was added.
+- **`.gitignore`**: adds `lib/default-prompt-inject.claude.md` and `lib/default-prompt-inject.*.md`, so future variants are covered automatically and no plaintext slips into the repository.
+
 # 1.1.95
 
 ## 中文

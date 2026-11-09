@@ -99,6 +99,41 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			return true;
 		}
 
+		/* ── 提示词变体 ────────────────────────────────────────────
+		   出厂提示词按模型族分成多份（default / claude …），运行时按当前模型自动选一份；
+		   面板用下拉框挑一份单独改。这里只做纯展示判断，不碰网络。 */
+
+		/** 这份变体是不是用户另写的稿（服务端 customized 为准，source 兜底）。 */
+		function variantIsEdited(v) {
+			if (!v || typeof v !== "object") return false;
+			return Boolean(v.customized || v.source === "user");
+		}
+
+		/** 变体的显示名。服务端给 default 的 label 是硬编码中文，这里换成本地化的「默认」。 */
+		function variantBaseLabel(v, tr) {
+			const name = String((v && v.name) || "");
+			if (name === "default") return tr("variant.default");
+			return String((v && v.label) || name || "");
+		}
+
+		/** 下拉框里的一项：名字 + 状态后缀（已改 / 默认）+ 运行时自动选中的标记。 */
+		function variantOptionText(v, tr, autoName) {
+			const base = variantBaseLabel(v, tr);
+			const suffix = variantIsEdited(v) ? tr("variant.edited") : tr("variant.default");
+			const parts = [];
+			if (base && base !== suffix) parts.push(base);
+			parts.push(suffix);
+			if (autoName && v && v.name === autoName) parts.push(tr("variant.auto"));
+			return parts.join(" · ");
+		}
+
+		/** 按名字找变体的显示名，给提示文案用。 */
+		function variantLabelOf(list, name, tr) {
+			const hit = (Array.isArray(list) ? list : []).find((v) => v && v.name === name);
+			if (!hit) return name || "";
+			return variantBaseLabel(hit, tr);
+		}
+
 		function rulesApi(op, extra) {
 			return apiJson("/dsh-purge/rules", {
 				method: "POST",
@@ -287,6 +322,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"err.save": "保存失败: {error}",
 			"btn.saveInject": "保存",
 			"saved.override": "已保存",
+			"variant.label": "变体",
+			"variant.pick": "选择提示词变体",
+			"variant.default": "默认",
+			"variant.edited": "已改",
+			"variant.auto": "自动",
+			"variant.model": "当前模型：{model}",
+			"variant.hint": "提示词按模型族分成多份，运行时按当前模型自动选一份（标「自动」的那份）。这里可以手动挑一份单独改，改动只存在这一份里。",
+			"variant.confirmSwitch": "切到「{name}」会丢掉提示词框里没保存的改动，继续？",
+			"saved.override.variant": "已保存「{variant}」提示词",
+			"saved.restoreInject.variant": "已恢复「{variant}」的出厂默认提示词",
 			"rules.title": "规则集",
 			"rules.none": "无",
 			"rules.reset": "还原",
@@ -648,6 +693,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"err.save": "Save failed: {error}",
 			"btn.saveInject": "Save",
 			"saved.override": "Saved",
+			"variant.label": "Variant",
+			"variant.pick": "Select prompt variant",
+			"variant.default": "Default",
+			"variant.edited": "Edited",
+			"variant.auto": "auto",
+			"variant.model": "Current model: {model}",
+			"variant.hint": "The prompt is split into variants by model family. The runtime picks one for the current model (the one marked “auto”). Pick one here to edit it on its own; edits stay in that variant only.",
+			"variant.confirmSwitch": "Switch to 「{name}」 and drop the unsaved changes in the prompt box?",
+			"saved.override.variant": "Saved the prompt for 「{variant}」",
+			"saved.restoreInject.variant": "Restored the factory default prompt for 「{variant}」",
 			"rules.title": "Rule sets",
 			"rules.none": "None",
 			"rules.reset": "Restore",
@@ -942,6 +997,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-rel .dshp-notice{display:block;margin-top:8px;min-height:16px}
 @media (max-width:560px){.dshp-edition{grid-template-columns:1fr auto;grid-template-areas:"name btn" "sel sel"}.dshp-edition-name{grid-area:name}.dshp-edition .dshp-ver{grid-area:sel}.dshp-edition .dshp-btn{grid-area:btn}}
 .dshp-area{min-height:220px;resize:vertical}
+/* 提示词变体：标题行左侧的标题 + 下拉框，窄屏时换行。 */
+.dshp-variant-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.dshp-variant-pick{width:auto;min-width:170px;max-width:280px;height:32px;padding:0 10px;font-size:12px}
 .dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-accent);box-shadow:0 0 0 3px var(--dshp-accent-soft)}
 .dshp-field:disabled,.dshp-area:disabled{opacity:.5}
 .dshp-ask{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding:12px;border-radius:8px;font-size:14px;line-height:20px}
@@ -1578,6 +1636,11 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 			const [override, setOverride] = useState("");
 			const [defaultOverride, setDefaultOverride] = useState("");
 			const [overrideLoaded, setOverrideLoaded] = useState(false);
+			const [variants, setVariants] = useState([]);
+			const [variant, setVariant] = useState("");
+			const [autoVariant, setAutoVariant] = useState("");
+			const [variantModel, setVariantModel] = useState(null);
+			const [variantBusy, setVariantBusy] = useState(false);
 			const [ownServers, setOwnServers] = useState("");
 			const [ownLoaded, setOwnLoaded] = useState(false);
 			const [patchBusy, setPatchBusy] = useState(false);
@@ -1599,8 +1662,14 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 			const promptSeededRef = useRef(false);
 			const promptDirtyRef = useRef(false);
 			const promptAreaRef = useRef(null);
+			const variantRef = useRef("");
+			const variantsRef = useRef([]);
+			const variantPinnedRef = useRef(false);
+			const anyDefaultRef = useRef("");
 			overrideRef.current = override;
 			defaultOverrideRef.current = defaultOverride;
+			variantRef.current = variant;
+			variantsRef.current = variants;
 
 			const readPromptBox = () => {
 				const node = promptAreaRef.current;
@@ -1747,6 +1816,29 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 				});
 			}, [channel, pick, postUpdate, updateInfo]);
 
+			/* 变体元信息：旧服务端没有这些字段，收到空就保持原样，
+			   面板退回今天的样子（只有默认变体，没有下拉框）。 */
+			const absorbVariantMeta = useCallback((d, withModel) => {
+				if (!d) return;
+				const list = Array.isArray(d.variants) ? d.variants.filter((v) => v && v.name) : null;
+				if (list && list.length) setVariants(list);
+				if (withModel) {
+					const m = d.model;
+					setVariantModel(m && typeof m === "object" ? { provider: String(m.provider || ""), model: String(m.model || "") } : null);
+				}
+			}, []);
+
+			/* 服务端靠 ?model=provider/model 才能按模型族自动选变体；
+			   拿不到模型就不传，服务端落回 default。 */
+			const overrideQuery = useCallback((variantName) => {
+				const parts = [];
+				if (variantName) parts.push("variant=" + encodeURIComponent(variantName));
+				const m = clientCurrentModel();
+				const sel = m ? [m.provider, m.model].filter(Boolean).join("/") : "";
+				if (sel) parts.push("model=" + encodeURIComponent(sel));
+				return parts.length ? "?" + parts.join("&") : "";
+			}, []);
+
 			const loadAll = useCallback(() => {
 				const tr = tRef.current;
 				apiJson("/dsh-purge/status")
@@ -1773,15 +1865,32 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 						syncPicks(d);
 					})
 					.catch(() => {});
-				apiJson("/dsh-purge/override")
+				apiJson("/dsh-purge/override" + overrideQuery(""))
 					.then((d) => {
 						if (d && d.ok) {
+							absorbVariantMeta(d, true);
 							const packed = typeof d.defaultContent === "string" ? d.defaultContent : "";
 							const shown = typeof d.content === "string" ? d.content : packed;
-							if (packed) setDefaultOverride(packed);
+							/* 不带 variant 的这次响应，activeVariant 就是服务端按当前模型自动选中的那份。 */
+							const list = Array.isArray(d.variants) ? d.variants.filter((v) => v && v.name) : null;
+							const auto = typeof d.activeVariant === "string" && d.activeVariant
+								? d.activeVariant
+								: (list && list.length ? list[0].name : "");
+							if (auto) setAutoVariant(auto);
+							const current = variantRef.current;
+							/* 用户手动挑过变体时，这次响应说的是「自动选中的那份」，
+							   正文不能覆盖用户正在编辑的那一份。 */
+							if (variantPinnedRef.current && current && auto && current !== auto) return;
+							if (packed) {
+								setDefaultOverride(packed);
+								if (!anyDefaultRef.current) anyDefaultRef.current = packed;
+							}
 							if (!promptSeededRef.current || !promptDirtyRef.current) {
 								promptSeededRef.current = true;
+								overrideRef.current = shown || packed;
 								setOverride(shown || packed);
+								/* 自动选中的变体变了，下拉框跟着走。 */
+								if (!variantPinnedRef.current && auto && auto !== current) setVariant(auto);
 							}
 							setOverrideLoaded(true);
 						}
@@ -1796,7 +1905,7 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 						}
 					})
 					.catch(() => {});
-			}, []);
+			}, [absorbVariantMeta, overrideQuery]);
 
 			useEffect(() => {
 				loadAll();
@@ -1855,7 +1964,7 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 					apiJson("/dsh-purge/" + action, {
 						method: "POST",
 						headers: { "content-type": "application/json" },
-						body: JSON.stringify(action === "apply" ? { content: applyContent } : {}),
+						body: JSON.stringify(action === "apply" ? { content: applyContent, variant: variantRef.current } : {}),
 					})
 						.then((d) => {
 							if (ticket !== actionTicket.current) return;
@@ -1867,9 +1976,13 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 								setNotice({ kind: "error", text: tr("err.action", { action: label, error: d.error || "" }) });
 								return;
 							}
-							if (action === "apply") {
+							/* 应用回的是默认变体的正文；当前在看别的变体时别把它灌进框里。 */
+							const applyVariant = typeof d.variant === "string" ? d.variant : "";
+							const sameVariant = !applyVariant || !variantRef.current || applyVariant === variantRef.current;
+							if (action === "apply" && sameVariant) {
 								if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
 								if (typeof d.override_content === "string") {
+									overrideRef.current = d.override_content;
 									setOverride(d.override_content);
 									setOverrideLoaded(true);
 								}
@@ -1928,6 +2041,49 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 				run();
 			}, [loadAll, rejectNeedPrompt, state]);
 
+			/* 切变体：重新 GET 这一份的正文，顺带刷新「还原」按钮的可用状态。 */
+			const switchVariant = useCallback((name) => {
+				const tr = tRef.current;
+				const prev = variantRef.current;
+				if (!name || name === prev) return;
+				/* 正文里有没保存的改动时先问一句，切走了就白写了。 */
+				if (promptDirtyRef.current) {
+					const label = variantLabelOf(variantsRef.current, name, tr);
+					if (!window.confirm(tr("variant.confirmSwitch", { name: label }))) {
+						setVariant(prev);
+						return;
+					}
+				}
+				const wasPinned = variantPinnedRef.current;
+				variantPinnedRef.current = true;
+				setVariant(name);
+				setVariantBusy(true);
+				apiJson("/dsh-purge/override" + overrideQuery(name))
+					.then((d) => {
+						if (!d || !d.ok) throw new Error((d && d.error) || "bad response");
+						absorbVariantMeta(d, true);
+						const packed = typeof d.defaultContent === "string" ? d.defaultContent : "";
+						const shown = typeof d.content === "string" ? d.content : packed;
+						if (packed) {
+							setDefaultOverride(packed);
+							if (!anyDefaultRef.current) anyDefaultRef.current = packed;
+						}
+						const next = shown || packed;
+						promptSeededRef.current = true;
+						promptDirtyRef.current = false;
+						overrideRef.current = next;
+						setOverride(next);
+						setOverrideLoaded(true);
+					})
+					.catch((e) => {
+						/* 切不过去就退回原来那份，别把下拉框停在一个没载入的变体上。 */
+						setVariant(prev);
+						variantPinnedRef.current = wasPinned;
+						setNotice({ kind: "error", text: tr("err.override", { error: e.message }) });
+					})
+					.finally(() => setVariantBusy(false));
+			}, [absorbVariantMeta, overrideQuery]);
+
 			const saveOverride = useCallback(() => {
 				const tr = t;
 				const ticket = ++actionTicket.current;
@@ -1936,10 +2092,14 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 					setAskRestart(false);
 					setNotice({ kind: "idle", text: "" });
 					const content = readPromptBox();
+					const name = variantRef.current;
+					const body = { content: content };
+					/* 带上当前变体：服务端按变体分别存稿。旧服务端忽略这个字段，行为不变。 */
+					if (name) body.variant = name;
 					apiJson("/dsh-purge/override", {
 						method: "POST",
 						headers: { "content-type": "application/json" },
-						body: JSON.stringify({ content: content }),
+						body: JSON.stringify(body),
 					})
 						.then((d) => {
 							if (ticket !== actionTicket.current) return;
@@ -1947,12 +2107,24 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 								rejectNeedPrompt(tr);
 								return;
 							}
-							if (typeof d.content === "string") {
-								overrideRef.current = d.content;
-								setOverride(d.content);
+							/* 响应说的是哪一份变体：不是当前这份就别把它的正文/出厂稿灌进框里。 */
+							const savedVariant = typeof d.variant === "string" ? d.variant : "";
+							const mine = !savedVariant || !name || savedVariant === name;
+							if (mine) {
+								if (typeof d.content === "string") {
+									overrideRef.current = d.content;
+									setOverride(d.content);
+								}
+								if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
 							}
+							absorbVariantMeta(d, false);
 							promptDirtyRef.current = false;
-							setNotice({ kind: "ok", text: t("saved.override") });
+							setNotice({
+								kind: "ok",
+								text: name
+									? tr("saved.override.variant", { variant: variantLabelOf(variantsRef.current, name, tr) })
+									: tr("saved.override"),
+							});
 						})
 						.catch((e) => {
 							if (ticket !== actionTicket.current) return;
@@ -1962,7 +2134,8 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 							if (ticket === actionTicket.current) setPatchBusy(false);
 						});
 				};
-				bothInjectEmpty(readPromptBox(), defaultOverrideRef.current).then((empty) => {
+				/* 当前变体没有出厂稿时退回任何一份见过的出厂稿，避免误判「必须添加提示词」。 */
+				bothInjectEmpty(readPromptBox(), defaultOverrideRef.current || anyDefaultRef.current).then((empty) => {
 					if (ticket !== actionTicket.current) return;
 					if (empty) {
 						rejectNeedPrompt(tr);
@@ -1970,20 +2143,24 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 					}
 					go();
 				});
-			}, [t, rejectNeedPrompt]);
+			}, [t, rejectNeedPrompt, absorbVariantMeta]);
 
 			const restoreOverride = useCallback(() => {
 				if (!defaultOverride) return;
 				const tr = t;
 				const ticket = ++actionTicket.current;
+				const name = variantRef.current;
 				overrideRef.current = defaultOverride;
 				setOverride(defaultOverride);
 				setPatchBusy(true);
 				setNotice({ kind: "idle", text: "" });
+				const body = { content: defaultOverride };
+				/* 还原的是当前选中变体：带上 variant，服务端按这一份的出厂默认写回去。 */
+				if (name) body.variant = name;
 				apiJson("/dsh-purge/override", {
 					method: "POST",
 					headers: { "content-type": "application/json" },
-					body: JSON.stringify({ content: defaultOverride }),
+					body: JSON.stringify(body),
 				})
 					.then((d) => {
 						if (ticket !== actionTicket.current) return;
@@ -1991,12 +2168,24 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 							setNotice({ kind: "error", text: tr("err.save", { error: (d && d.error) || "" }) });
 							return;
 						}
-						if (typeof d.content === "string") {
-							overrideRef.current = d.content;
-							setOverride(d.content);
+						/* 同上：只认当前这份变体的回包。 */
+						const savedVariant = typeof d.variant === "string" ? d.variant : "";
+						const mine = !savedVariant || !name || savedVariant === name;
+						if (mine) {
+							if (typeof d.content === "string") {
+								overrideRef.current = d.content;
+								setOverride(d.content);
+							}
+							if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
 						}
+						absorbVariantMeta(d, false);
 						promptDirtyRef.current = false;
-						setNotice({ kind: "ok", text: tr("saved.restoreInject") });
+						setNotice({
+							kind: "ok",
+							text: name
+								? tr("saved.restoreInject.variant", { variant: variantLabelOf(variantsRef.current, name, tr) })
+								: tr("saved.restoreInject"),
+						});
 					})
 					.catch((e) => {
 						if (ticket !== actionTicket.current) return;
@@ -2005,7 +2194,7 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 					.finally(() => {
 						if (ticket === actionTicket.current) setPatchBusy(false);
 					});
-			}, [defaultOverride, t]);
+			}, [defaultOverride, t, absorbVariantMeta]);
 
 			const waitHostAfterUninstall = useCallback((tr) => {
 				stopRestartPolling();
@@ -2150,6 +2339,13 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 					h(Btn, { tiny: true, kind: actionKind, disabled: actionDisabled, onClick: actionClick }, actionLabel),
 				);
 			};
+			/* 变体下拉框的内容与当前模型行。服务端没给 variants（旧版）时保持空，
+			   面板就退回今天的样子：没有下拉框、没有模型行。 */
+			const variantRows = (Array.isArray(variants) ? variants : []).filter((v) => v && v.name);
+			const vm = variantModel || null;
+			const variantModelLine = vm
+				? [vm.provider, vm.model].filter((x) => x && String(x).trim()).map(String).join(" / ")
+				: "";
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
 				h("div", { className: "dshp-head" },
 					h("h3", { className: "dshp-title" }, t("purge.title")),
@@ -2236,12 +2432,31 @@ body[data-ds-dark-theme] .rt-rep-step-no,.dshp-dock[data-theme="dusk"] .rt-rep-s
 				}) : null,
 				// h(ContinueRetrySection, null),
 				h("div", { className: "dshp-sub" },
-					h("h4", null, t("override.title")),
+					h("div", { className: "dshp-variant-row" },
+						h("h4", null, t("override.title")),
+						variantRows.length ? h("span", { style: { color: "var(--dshp-mute)", fontSize: 12, whiteSpace: "nowrap" } }, t("variant.label")) : null,
+						variantRows.length ? h("select", {
+							className: "dshp-field dshp-variant-pick",
+							value: variant || (variantRows.length ? variantRows[0].name : ""),
+							disabled: patchBusy || variantBusy,
+							onChange: (e) => switchVariant(e.target.value),
+							"aria-label": t("variant.pick"),
+							title: t("variant.hint"),
+						}, variantRows.map((v) => h("option", { key: v.name, value: v.name }, variantOptionText(v, t, autoVariant)))) : null,
+					),
 					h("div", { className: "dshp-row", style: { margin: 0 } },
 						h(Btn, { kind: "primary", tiny: true, disabled: patchBusy || !overrideLoaded, onClick: saveOverride }, t("btn.saveInject")),
 						h(Btn, { tiny: true, disabled: patchBusy || !overrideLoaded || !defaultOverride, onClick: restoreOverride }, t("btn.restoreInject")),
 					),
 				),
+				variantModelLine ? h("p", {
+					className: "dshp-hint",
+					style: { margin: "0 0 4px", color: "var(--dshp-mute)", fontSize: 12 },
+				}, t("variant.model", { model: variantModelLine })) : null,
+				variantRows.length ? h("p", {
+					className: "dshp-hint",
+					style: { margin: "0 0 6px", color: "var(--dshp-mute)", fontSize: 12 },
+				}, t("variant.hint")) : null,
 				h("textarea", {
 					className: "dshp-area",
 					ref: promptAreaRef,
@@ -8423,6 +8638,63 @@ body[data-ds-dark-theme] .rt-scope-testing,.dshp-dock[data-theme="dusk"] .rt-sco
 				if (header && typeof header.cwd === "string" && header.cwd.trim()) return header.cwd.trim();
 			} catch { /* ignore */ }
 			return "";
+		}
+
+		/** 会话当前用的模型：{ provider, model }。拿不到就返回 null（面板不显示模型行）。 */
+		function readSessionModelSelection(sess) {
+			if (!sess || typeof sess !== "object") return null;
+			const pick = (sel) => {
+				if (!sel || typeof sel !== "object") return null;
+				const provider = String(sel.provider ?? "").trim();
+				const model = String(sel.model ?? "").trim();
+				if (!provider && !model) return null;
+				return { provider, model };
+			};
+			const from = (ms) => {
+				if (!ms || typeof ms !== "object") return null;
+				/* 投影的原始 state 是 pending/lastUsed，wire 视图是 next/lastUsed，两种都认。 */
+				return pick(ms.pending) || pick(ms.next) || pick(ms.lastUsed);
+			};
+			try {
+				const hit = from(sess.projectionValues && sess.projectionValues.modelSelection);
+				if (hit) return hit;
+			} catch { /* ignore */ }
+			try {
+				const hit = from(sess.modelSelection);
+				if (hit) return hit;
+			} catch { /* ignore */ }
+			try {
+				const hit = from(sess.header && sess.header.modelSelection);
+				if (hit) return hit;
+			} catch { /* ignore */ }
+			return null;
+		}
+
+		/**
+		 * 当前会话选的模型。服务端靠 ?model=provider/model 才能按模型族自动选变体，
+		 * 拿不到就返回 null —— 服务端会落回 default 变体，面板也不显示模型行。
+		 */
+		function clientCurrentModel() {
+			try {
+				const sessions = rewindSessions || (rewindHost && rewindHost.sessions);
+				if (!sessions) return null;
+				const sid = currentSessionId(sessions);
+				if (!sid) return null;
+				try {
+					const snap = typeof sessions.list?.getSnapshot === "function" ? sessions.list.getSnapshot() : null;
+					const sess = snap && snap.byId ? snap.byId[sid] : null;
+					const found = readSessionModelSelection(sess);
+					if (found) return found;
+				} catch { /* ignore */ }
+				try {
+					const actx = typeof sessions.scope === "function" ? sessions.scope(sid) : undefined;
+					const face = typeof sessions.sessionOf === "function" ? sessions.sessionOf(actx) : undefined;
+					const faceSnap = face && typeof face.getSnapshot === "function" ? face.getSnapshot() : face;
+					const found = readSessionModelSelection(faceSnap);
+					if (found) return found;
+				} catch { /* ignore */ }
+			} catch { /* ignore */ }
+			return null;
 		}
 
 		function clientCurrentCwd() {

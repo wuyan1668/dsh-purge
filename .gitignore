@@ -27,6 +27,8 @@ _archive/
 lib/default-prompt-inject.md
 lib/default-prompt-inject.zh.md
 lib/default-prompt-inject.en.md
+lib/default-prompt-inject.claude.md
+lib/default-prompt-inject.*.md
 default-prompt-inject.md
 
 # 本机官方安装包、解包目录、拆出的压缩包

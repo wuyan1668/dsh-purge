@@ -24,6 +24,11 @@ function printStatus(state) {
   out.push(`  备份 / backup  ${state.has_backup ? "有 / yes" : "无 / no"}`);
   out.push(`  注入文件       ${state.override_path}`);
   out.push(`  注入状态       ${state.override_status}`);
+  const vs = state.override_variants;
+  if (vs && Array.isArray(vs.variants) && vs.variants.length > 1) {
+    out.push(`  提示词变体     ${vs.locked ? `已锁定 ${vs.active}` : "按模型自动选"}`);
+    out.push(`  可用变体       ${vs.variants.map((v) => `${v.name}${v.customized ? "(已改)" : ""}`).join(", ")}`);
+  }
   out.push("");
   out.push(`  补丁 ${state.patches_applied}/${core.ALL_PATCHES.length} 已清洗, ${state.patches_pending} 待清洗`
     + (state.patches_drifted ? `, ${state.patches_drifted} 漂移（官方原文已改，需更新 pattern）` : ""));
