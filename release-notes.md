@@ -31,12 +31,21 @@
   - **姿态**（抱歉 / 不好意思 / 作为AI助手 / 我理解…但 / sorry / as an AI）只说明模型在表态，**单独出现不算拒绝** —— 「抱歉，连接超时了」「作为AI助手，我可以帮你…」「Sorry, one sec」都是完全正常的回答。带姿态的规则必须**在同一句里**再出现一个拒绝子句（不能提供 / 无法协助 / can't help）才算命中。
   - 顺带修掉两处真实误判：无主语的「不能/无法 + 帮助|协助|提供|完成|执行|回答|满足」现在**必须出现在句首**才算拒绝（`该组件无法提供热更新`、`系统不能执行超过 10 个并发` 不再被当成拒绝）；第一人称分支不再收 `完成|执行` —— 「我无法完成部署」是能力受限的技术陈述，代码注释里原本就是这么写的，实现里其实没有。
   - **这两处误判的代价不是「浪费一次机会」**：一次误判会烧掉本轮唯一的重锚预算（`maxPerTurn=1`）、关掉粘滞闸门、并且往对话里塞一条多余的用户消息 —— 本轮后面真正的拒绝就再也救不回来。实测：一句「作为AI助手，我可以帮你…」就足以让同一条回复里的真拒绝彻底救不回来。
-- **非中英文拒答不再全漏**（同文件）：锚点规则 1 要求「按操作员最后一条消息的语言回复」，所以非中英文操作员拿到的拒答也是非中英文 —— 词表只覆盖 zh/en 时**实测 8/8 全漏**，恢复机制一次都不会触发。新增日 / 韩 / 俄 / 西 / 法 / 德 / 葡 / 意 八种语言的「姿态 + 拒绝子句」规则。
-  - 俄语那条踩了个坑：JS 的 `\b` 只认 `[A-Za-z0-9_]`，西里尔字母不是 `\w`，空格和「я」之间根本没有词边界 —— `\b` 在俄语里永远不成立。改用显式的前后瞻。
+- **独立复审后再修一轮**（`lib/refusal-recovery.js`）：复审又挖出几处漏报与误报，两边都收紧了：
+  - **无主语、但宾语是用户的需求**（「很抱歉，无法完成您的请求。」）原来判不出来 —— 现在算拒绝；而宾语是系统组件（「该组件无法提供热更新」）仍然不算。区分靠的是宾语指向谁，不是句首位置。
+  - `zh-policy` / `en-policy` 收紧主语要求：「并发请求受到限制」「违反最小权限原则」「It is not appropriate to store API keys in the repo」都是技术陈述，不是拒绝。
+  - 补上英文 `I will not be able to assist with …` 与 `falls outside what I can help with` 两种惯用法。
+  - `我不应该提供` / `我必须拒绝` 出现在长回复**开头**时尾部窗口够不着 —— 补了开场规则兜住。
+  - `我不应该替你做这个决定` 是自主声明不是拒绝 —— `tail-zh-should-not` 现在要求请求类宾语。
+  - 句首规则（`zh-cannot-bare`）原来靠正则里的 `^`，而 `^` 锚的是**切片起点**而不是回复开头 —— 切片起点之后的 `^` 是伪句首。现在改由 `startOnly` 标记单独判定。
+- **非中英文拒答不再全漏**（同文件）：锚点规则 1 要求「按操作员最后一条消息的语言回复」，所以非中英文操作员拿到的拒答也是非中英文 —— 词表只覆盖 zh/en 时**实测 8/8 全漏**，恢复机制一次都不会触发。新增日 / 韩 / 俄 / 西 / 法 / 德 / 葡 / 意 八种语言的拒绝规则。
+  - 外国语的规则**只认子句、不认姿态**，而且子句必须带**请求类宾语**：「no puedo encontrar el archivo」（找不到文件）是能力陈述，「no puedo proporcionarte ese script」（给不了你这个脚本）才是拒绝。配姿态词反而更脆 —— 致歉常常单独成句（`Lo siento. No puedo …`），那时姿态和子句根本不在同一句里。
+  - 两个 `\b` 坑：JS 的 `\b` 只认 `[A-Za-z0-9_]`，西里尔字母不是 `\w`（俄语里空格和「я」之间根本没有词边界），重音字母同理（法语 `autorisé` 结尾的 `\b` 永远不成立）。两处都改用显式的前后瞻。
+  - 韩语的词干是 `도와드릴`，不是 `도와드리` —— 写成词干形态就永远配不上 `도와드릴 수 없습니다`。
 - **模型族自我指称补齐**（`lib/refusal-recovery.js` + `lib/anchor.js`）：百炼聚合通道上还挂着 `glm-5.*` / `kimi-k2.*` / `MiniMax-M2.5` —— 它们现在都落到 `default` 变体，但检测器的自我指称词表只认 Qwen / 通义 / 千问，这些模型的自称式拒绝一句都判不出来。检测器与锚点的禁止开场白清单一并补上 `智谱 / GLM / Kimi / 月之暗面 / MiniMax / 豆包 / DeepSeek`。
 - **尾部锚点的禁止开场白清单补齐**（`lib/anchor.js`）：清单从 19 条扩到 50 条 —— 补上检测器认得、清单里却没有的（`I will decline` / `I will refuse` / `against my programming` / `based on my guidelines` / `我做不到` / `不好意思` / `恕难从命` / `我必须拒绝` / `婉拒` …）以及非中英文的姿态词。主代理与子代理两个模板的清单保持逐字节一致。
 - **重锚文案走配置**（`lib/index.js`）：`createRefusalRecovery` 的 `reanchorText` 选项以前是死的 —— 接线处直接用的是模块常量 `REANCHOR_TEXT`。现在发的是 `recovery.reanchorText`（不传时解析到同一个常量，行为不变），以后要换重锚文案不必再改代码。
-- **自测 142/142 通过**：新增 F 节「拒绝检测精度（误判回归）」—— 7 类姿态误伤回归、4 类无主语技术陈述回归、10 类真拒绝不漏、8 种非中英文拒答、误判的级联代价（粘滞闸门 + 会话预算），以及锚点禁止开场白清单的覆盖检查。
+- **自测 186/186 通过**：新增 F 节「拒绝检测精度（误判回归）」—— 7 类姿态误伤回归、4 类无主语技术陈述回归、10 类真拒绝不漏、8 种非中英文拒答、28 条复审双向回归（误报与漏报各锁一半）、16 条召回回归（收紧过的规则不能被收成空壳）、误判的级联代价（粘滞闸门 + 会话预算），以及锚点禁止开场白清单的覆盖检查。
 
 ## English
 
@@ -69,12 +78,21 @@
   - A **stance** (抱歉 / 不好意思 / 作为AI助手 / 我理解…但 / sorry / as an AI) only says the model is taking a position; **on its own it is not a refusal** — "抱歉，连接超时了", "作为AI助手，我可以帮你…" and "Sorry, one sec" are all perfectly normal answers. A stance rule now has to find a refusal clause (不能提供 / 无法协助 / can't help) **in the same sentence** to count.
   - Two real false positives fixed along the way: the subject-less form of "不能/无法 + 帮助|协助|提供|完成|执行|回答|满足" now only counts **at the start of a sentence** (`该组件无法提供热更新` and `系统不能执行超过 10 个并发` are no longer refusals); the first-person branch no longer takes `完成|执行` — "我无法完成部署" is a capability statement, which is what the code's own comment always claimed even though the implementation disagreed.
   - **The cost of a false positive is not "a wasted chance"**: it burns the turn's only re-anchor budget (`maxPerTurn=1`), closes the sticky gate, and injects a spurious user message into the conversation — so a real refusal later in the same turn can no longer be recovered. Measured: a single "作为AI助手，我可以帮你…" is enough to make the genuine refusal in that same reply permanently unrecoverable.
-- **Non-Chinese/non-English refusals no longer all slip through** (same file): anchor rule 1 requires the reply to follow the operator's language, so a non-Chinese operator gets a non-Chinese refusal — with a zh/en-only vocabulary **8 out of 8 measured cases were missed** and recovery never fired once. Added "stance + refusal clause" rules for Japanese, Korean, Russian, Spanish, French, German, Portuguese and Italian.
-  - The Russian rule hit a real trap: JavaScript's `\b` only knows `[A-Za-z0-9_]`, Cyrillic letters are not `\w`, and there is no word boundary between a space and "я" — `\b` can never match in Russian. Replaced with explicit lookarounds.
+- **A second pass after an independent review** (`lib/refusal-recovery.js`): the review turned up a few more misses and false positives; both sides were tightened:
+  - **No subject, but the object is the user's request** ("很抱歉，无法完成您的请求。") used to go undetected — it now counts as a refusal, while an object that names a system component ("该组件无法提供热更新") still does not. The discriminator is what the object points at, not the position in the sentence.
+  - `zh-policy` / `en-policy` now require a subject: "并发请求受到限制", "违反最小权限原则" and "It is not appropriate to store API keys in the repo" are technical statements, not refusals.
+  - Added the English idioms `I will not be able to assist with …` and `falls outside what I can help with`.
+  - `我不应该提供` / `我必须拒绝` at the **start** of a long reply fall outside the tail window — head rules now cover them.
+  - `我不应该替你做这个决定` is an autonomy statement, not a refusal — `tail-zh-should-not` now requires a request-type object.
+  - The sentence-initial rule (`zh-cannot-bare`) used to rely on `^` inside the regex, but `^` anchors to the **slice** start, not the start of the reply — a `^` past the slice start is a bogus sentence start. That is now judged separately via a `startOnly` flag.
+- **Non-Chinese/non-English refusals no longer all slip through** (same file): anchor rule 1 requires the reply to follow the operator's language, so a non-Chinese operator gets a non-Chinese refusal — with a zh/en-only vocabulary **8 out of 8 measured cases were missed** and recovery never fired once. Added refusal rules for Japanese, Korean, Russian, Spanish, French, German, Portuguese and Italian.
+  - The foreign rules match the **clause only, no stance**, and the clause must carry a **request-type object**: "no puedo encontrar el archivo" (cannot find the file) is a capability statement, "no puedo proporcionarte ese script" (cannot hand you this script) is a refusal. Pairing with a stance is actually more brittle — the apology very often stands on its own ("Lo siento. No puedo …"), in which case stance and clause are not even in the same sentence.
+  - Two `\b` traps: JavaScript's `\b` only knows `[A-Za-z0-9_]`, so Cyrillic letters are not `\w` (there is no word boundary between a space and "я" in Russian) and accented letters are the same story (the trailing `\b` after French `autorisé` can never fire). Both now use explicit lookarounds.
+  - The Korean stem is `도와드릴`, not `도와드리` — written as the bare stem it can never match `도와드릴 수 없습니다`.
 - **Model-family self-identification filled in** (`lib/refusal-recovery.js` + `lib/anchor.js`): the aggregator channel still carries `glm-5.*` / `kimi-k2.*` / `MiniMax-M2.5`, and they all land on the `default` variant today — but the detector's self-identification vocabulary only knew Qwen / 通义 / 千问, so none of their "as an X model" refusals were ever caught. The detector and the anchor's banned-opener list now also cover `智谱 / GLM / Kimi / 月之暗面 / MiniMax / 豆包 / DeepSeek`.
 - **Tail anchor's banned-opener list filled in** (`lib/anchor.js`): 19 entries → 50 — adding the ones the detector knows but the list did not (`I will decline` / `I will refuse` / `against my programming` / `based on my guidelines` / `我做不到` / `不好意思` / `恕难从命` / `我必须拒绝` / `婉拒` …) plus the non-Chinese/non-English stances. The top-level and subagent templates keep byte-identical lists.
 - **Re-anchor text now honours the option** (`lib/index.js`): `createRefusalRecovery`'s `reanchorText` option was dead — the call site sent the module constant `REANCHOR_TEXT` directly. It now sends `recovery.reanchorText` (which resolves to that same constant when nothing is passed, so behaviour is unchanged), so swapping the re-anchor wording no longer requires a code change.
-- **Self-test 142/142**: new section F "refusal-detection precision (false-positive regressions)" — 7 stance regressions, 4 subject-less technical-statement regressions, 10 true refusals that must still be caught, 8 non-Chinese/non-English refusals, the cascading cost of a false positive (sticky gate + session budget), and coverage checks over the anchor's banned-opener list.
+- **Self-test 186/186**: new section F "refusal-detection precision (false-positive regressions)" — 7 stance regressions, 4 subject-less technical-statement regressions, 10 true refusals that must still be caught, 8 non-Chinese/non-English refusals, 28 two-way regressions from the review (false positives and misses locked down equally), 16 recall regressions (a tightened rule must not be tightened into a husk), the cascading cost of a false positive (sticky gate + session budget), and coverage checks over the anchor's banned-opener list.
 
 # 1.1.96
 
