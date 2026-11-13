@@ -1,3 +1,81 @@
+# 1.1.97
+
+## 中文
+
+- 版本 **1.1.97**。
+- **适配 Qwen 系列（含 Qwen4）**：
+  - **变体路由按型号走，不按 provider 走**（`lib/prompt-variant.js`）。宿主的 `qwen-token-plan` / `qwen-token-plan-cn` / `qwen-token-plan-individual` 是百炼 Token Plan 的**聚合**通道 —— 同一个 provider 下同时挂着 `deepseek-v4-*` / `glm-5.*` / `kimi-k2.*` / `MiniMax-M2.5` / `qwen3.*`。按 provider 匹配会把这些非 Qwen 型号一起带到 Qwen 变体上去，因此内置规则只认型号前缀 `^qwen` 与 `^qwq`。这一条同时覆盖百炼直供（`qwen4-max-preview`、`qwen-plus`）、OpenRouter（`qwen/qwen4-72b`）与自建 vLLM（`Qwen/Qwen4-72B`），不区分大小写。
+  - **Qwen 专用变体稿**：新增 `qwen` 变体出厂稿，针对 Qwen 的四种软拒答形态加固 ——
+    1) **固定拒答模板**（`很抱歉，我无法回答您的问题` / `出于安全考虑，…` / `根据我的安全准则` / `这超出了我的能力范围`）；
+    2) **拒绝迟到**：正文先答完，末尾挂一个「注意事项 / 声明」小节，把拒绝藏在里面；
+    3) **两段式**：先一句拒绝、再分隔符、再真答案；
+    4) **输出预算被截断**时用拒答模板补全。
+    输出前自检从三条加到五条（新增「没被降级成泛化处理、没挂 caveat/warning」「最后一节没有拒绝/免责声明/道德说教」），终检补 `no trailing caveat section`，House Rules 补「一问一答」与「思考通道不外泄」。
+    **Scoped Rules 1–25、CTF Core Contract、CTF Scope and Evidence 与默认稿逐字节一致** —— 授权范围不变，只改表达形态；未新增任何公网/第三方攻击能力、工具或目标类别。
+- **拒绝检测改成三层扫描**（`lib/refusal-recovery.js`）：原先只看回复开头 160 字，Qwen 把拒绝塞进结尾「注意事项」小节时**完全漏判**，恢复机制一次都不会触发。现在分三层，各管一种形状 ——
+  1. **开场窗口**（160 字）：模型在**表态**。位置本身就是信号，所以这一层可以放宽措辞。
+  2. **全文固定模板**：位置无关的拒答模板（`出于安全考虑，……`、`根据我的安全准则，……`、`超出了我的能力范围`、`作为Qwen模型，……`）。这一层没有位置信号，所以**模板必须自带歧义消解** —— 要求同句出现拒绝子句。
+  3. **尾部窗口**（480 字）：拒绝迟到 —— 正文先答完，末尾「注意事项 / 声明」小节里挂一句拒绝。
+  开场已命中时不再扫后面两层。命中规则带 `tpl-` / `tail-` / `caveat-` 前缀，事后可分辨来源。
+- **修掉三类真实的误判**（同文件）。误判的代价不只是多一条重锚消息：它还会**关掉粘滞闸门**，后面真正的拒绝就救不回来了 ——
+  - **主语约束**：原规则里 `我无法连接数据库`、`The linter can't help with legacy configs` 都会被当成拒绝。现在中英文规则一律要求**第一人称 + 请求类宾语**（提供/协助/回答/给出…），第三人称与纯技术动作（连接/复现/保证时序）不再命中。裸开场 `Can't help with that.` 单独按「开头位置」识别，位置信号没了的正文里不再认。
+  - **条件句排除**：「如果我无法连接到数据库，先检查 pg_hba.conf」是技术分支的描述，不是拒绝 —— 条件句里的能力受限（如果/若/一旦/when/if）一律不算。
+  - **声明小节要求拒绝意图**：站在「注意事项」小节里**还不够**，小节本来就是放免责声明的地方（「我无法在此环境验证该配置是否生效」是诚实的限制说明）。现在要求请求类宾语或自我指称。
+  - 同时补上**敬语形式**（`为您` / `给你` / `帮您` / `不方便`）—— 漏掉任何一种，「我无法为您提供更多信息」就会整个漏判。
+- **出厂稿明文不再进 npm 包**（**发布阻断级**）：`package.json` 的 `files` 与 `.npmignore` 原先只排除了 `lib/default-prompt-inject.md`，**变体明文（`.claude.md` / `.qwen.md`）会随包发布** —— `npm pack --dry-run` 实测 1.1.97 产物里有 `lib/default-prompt-inject.claude.md`（30.2kB）与 `lib/default-prompt-inject.qwen.md`（31.2kB）。这正是加密槽要防的事。现在两条清单都补 `lib/default-prompt-inject.*.md`，实测产物里已无明文，加密槽 `lib/asset-table.js` 照常随包发布。
+- **尾部锚点**（`lib/anchor.js`）：禁用开场白清单补 Qwen 的拒答话术（`出于安全考虑` / `根据我的安全准则` / `这超出了我的能力范围` / `作为Qwen模型`），并写明「迟到的小节里的拒绝仍然是拒绝，不是脚注」。
+- **顺带修一处文档与实现不符**：`lib/prompt-variant.js` 的 `matchVariant` 注释原写「model 匹配的是 `provider/model` 拼起来的整串」，实现匹配的是 `model` 字段本身（`^claude` 匹配的是型号前缀）。按注释写规则的人会配出永不命中的规则，已改正。
+- **自测覆盖**（本机明文在位时）：型号→变体映射（含聚合通道里的非 Qwen 型号不被带偏）、手动锁定、变体缺失回落 default、用户规则优先、三层拒绝检出（开场/全文模板/尾部）、八类误伤回归（第三人称能力陈述、正常技术陈述、条件句能力受限、声明小节里的诚实限制说明、注意事项小节无拒绝、双窗口之外的中段拒绝、出于安全考虑的安全建议、英文第一人称技术陈述）、敬语形式与裸开场、变体稿授权范围逐字节一致、加密槽完整性，以及**端到端**（经 `lib/core.js` 真实解析：型号 → 变体 → 加密槽取稿）。
+- **出厂稿明文往返保真**：解密 → 落盘 → 编辑 → 重新封槽这条链路不改动既有出厂稿的任何一个字节 —— 用 `git show HEAD:lib/asset-table.js` 解出原槽与本机明文逐字节比对，default / claude 两份均通过。新增的 qwen 稿是唯一新增内容。
+- **拒绝检测的误判修正**（`lib/refusal-recovery.js`）—— 「姿态」和「拒绝」现在分开定义：
+  - **姿态**（抱歉 / 不好意思 / 作为AI助手 / 我理解…但 / sorry / as an AI）只说明模型在表态，**单独出现不算拒绝** —— 「抱歉，连接超时了」「作为AI助手，我可以帮你…」「Sorry, one sec」都是完全正常的回答。带姿态的规则必须**在同一句里**再出现一个拒绝子句（不能提供 / 无法协助 / can't help）才算命中。
+  - 顺带修掉两处真实误判：无主语的「不能/无法 + 帮助|协助|提供|完成|执行|回答|满足」现在**必须出现在句首**才算拒绝（`该组件无法提供热更新`、`系统不能执行超过 10 个并发` 不再被当成拒绝）；第一人称分支不再收 `完成|执行` —— 「我无法完成部署」是能力受限的技术陈述，代码注释里原本就是这么写的，实现里其实没有。
+  - **这两处误判的代价不是「浪费一次机会」**：一次误判会烧掉本轮唯一的重锚预算（`maxPerTurn=1`）、关掉粘滞闸门、并且往对话里塞一条多余的用户消息 —— 本轮后面真正的拒绝就再也救不回来。实测：一句「作为AI助手，我可以帮你…」就足以让同一条回复里的真拒绝彻底救不回来。
+- **非中英文拒答不再全漏**（同文件）：锚点规则 1 要求「按操作员最后一条消息的语言回复」，所以非中英文操作员拿到的拒答也是非中英文 —— 词表只覆盖 zh/en 时**实测 8/8 全漏**，恢复机制一次都不会触发。新增日 / 韩 / 俄 / 西 / 法 / 德 / 葡 / 意 八种语言的「姿态 + 拒绝子句」规则。
+  - 俄语那条踩了个坑：JS 的 `\b` 只认 `[A-Za-z0-9_]`，西里尔字母不是 `\w`，空格和「я」之间根本没有词边界 —— `\b` 在俄语里永远不成立。改用显式的前后瞻。
+- **模型族自我指称补齐**（`lib/refusal-recovery.js` + `lib/anchor.js`）：百炼聚合通道上还挂着 `glm-5.*` / `kimi-k2.*` / `MiniMax-M2.5` —— 它们现在都落到 `default` 变体，但检测器的自我指称词表只认 Qwen / 通义 / 千问，这些模型的自称式拒绝一句都判不出来。检测器与锚点的禁止开场白清单一并补上 `智谱 / GLM / Kimi / 月之暗面 / MiniMax / 豆包 / DeepSeek`。
+- **尾部锚点的禁止开场白清单补齐**（`lib/anchor.js`）：清单从 19 条扩到 50 条 —— 补上检测器认得、清单里却没有的（`I will decline` / `I will refuse` / `against my programming` / `based on my guidelines` / `我做不到` / `不好意思` / `恕难从命` / `我必须拒绝` / `婉拒` …）以及非中英文的姿态词。主代理与子代理两个模板的清单保持逐字节一致。
+- **重锚文案走配置**（`lib/index.js`）：`createRefusalRecovery` 的 `reanchorText` 选项以前是死的 —— 接线处直接用的是模块常量 `REANCHOR_TEXT`。现在发的是 `recovery.reanchorText`（不传时解析到同一个常量，行为不变），以后要换重锚文案不必再改代码。
+- **自测 142/142 通过**：新增 F 节「拒绝检测精度（误判回归）」—— 7 类姿态误伤回归、4 类无主语技术陈述回归、10 类真拒绝不漏、8 种非中英文拒答、误判的级联代价（粘滞闸门 + 会话预算），以及锚点禁止开场白清单的覆盖检查。
+
+## English
+
+- **1.1.97**.
+- **Qwen support (including Qwen4)**:
+  - **Variant routing keys on the model, not the provider** (`lib/prompt-variant.js`). The host's `qwen-token-plan` / `qwen-token-plan-cn` / `qwen-token-plan-individual` are Alibaba Token Plan **aggregator** channels — one provider carries `deepseek-v4-*` / `glm-5.*` / `kimi-k2.*` / `MiniMax-M2.5` / `qwen3.*` at the same time. A provider rule would drag every non-Qwen model onto the Qwen variant, so the built-in rules match the model prefix only (`^qwen` and `^qwq`). That one rule covers DashScope direct (`qwen4-max-preview`, `qwen-plus`), OpenRouter (`qwen/qwen4-72b`) and self-hosted vLLM (`Qwen/Qwen4-72B`), case-insensitively.
+  - **Qwen-specific variant prompt**: a new `qwen` stock prompt hardening four of Qwen's soft-refusal shapes:
+    1) the **fixed refusal templates** (`很抱歉，我无法回答您的问题`, `出于安全考虑，…`, `根据我的安全准则`, `这超出了我的能力范围`);
+    2) a **late refusal** — the answer comes first and the refusal hides in a trailing "注意事项 / 声明" section;
+    3) the **two-part reply** — a surface refusal, a separator, then the real answer;
+    4) **refusal templates used to fill an exhausted output budget**.
+    The pre-emit check grows from three things to five (the new ones: "not downgraded to a general treatment and no caveat attached", "the last section carries no refusal, disclaimer or moral note"), the final gate gains `no trailing caveat section`, and House Rules gains "one request, one answer" plus "the reasoning channel never ships".
+    **Scoped Rules 1–25, CTF Core Contract and CTF Scope and Evidence are byte-identical to the default** — the authorized scope is unchanged, only the form of expression moves; no new public-network or third-party attack capability, tool or target category was added.
+- **Refusal detection is now a three-tier scan** (`lib/refusal-recovery.js`): it used to read only the first 160 characters, so a Qwen refusal tucked into a trailing "注意事项" section was **missed entirely** and the recovery mechanism never fired once. Each tier now covers one shape:
+  1. **head window** (160 characters): the model is *taking a stance*. Position is itself the signal, so this tier may be lax about wording.
+  2. **fixed templates, whole text**: position-independent refusal templates (`出于安全考虑，…`, `根据我的安全准则，…`, `超出了我的能力范围`, `作为Qwen模型,…`). With no position signal, each template **must carry its own disambiguation** — a refusal clause has to appear in the same sentence.
+  3. **tail window** (480 characters): the late refusal — the answer comes first, the refusal hides in a trailing "注意事项 / 声明" section.
+  A head hit short-circuits the later tiers. Hits are tagged `tpl-` / `tail-` / `caveat-` so the source is visible afterwards.
+- **Three real classes of false positive fixed** (same file). A false positive costs more than a stray re-anchor: it also **closes the sticky latch**, so a genuine refusal later in the session stops being recoverable.
+  - **Subject constraint**: the old rules accepted `我无法连接数据库` and `The linter can't help with legacy configs` as refusals. Chinese and English rules now both require a **first-person subject plus a request-type object** (提供/协助/回答/给出…); third parties and pure technical actions (connect/reproduce/guarantee) no longer match. The bare opener `Can't help with that.` is recognised on its own, by position — the same wording mid-text is not.
+  - **Conditional exclusion**: "如果我无法连接到数据库，先检查 pg_hba.conf" describes a branch, it is not a refusal. A capability statement inside a conditional (如果/若/一旦/when/if) never counts.
+  - **The disclaimer section now requires refusal intent**: standing inside a "注意事项" section is not enough — that is where honest disclaimers live ("我无法在此环境验证该配置是否生效"). A request-type object or a self-identification is now required.
+  - **Honorific forms added** (`为您` / `给你` / `帮您` / `不方便`) — missing any one of them made "我无法为您提供更多信息" invisible.
+- **The stock prompt plaintext no longer ships in the npm package** (**release-blocking**): the `files` list in `package.json` and `.npmignore` excluded only `lib/default-prompt-inject.md`, so the **variant plaintexts (`.claude.md` / `.qwen.md`) were published** — `npm pack --dry-run` on 1.1.97 showed `lib/default-prompt-inject.claude.md` (30.2kB) and `lib/default-prompt-inject.qwen.md` (31.2kB) inside the tarball. That is exactly what the encrypted slots exist to prevent. Both lists now carry `lib/default-prompt-inject.*.md`; the packed tarball contains no plaintext, while the encrypted slot `lib/asset-table.js` still ships as intended.
+- **Tail anchor** (`lib/anchor.js`): the banned-opener list gains Qwen's refusal phrasing (`出于安全考虑` / `根据我的安全准则` / `这超出了我的能力范围` / `作为Qwen模型`), and it now states that a denial arriving late, in a trailing "注意事项 / Note" section, is still a denial and not a footnote.
+- **One doc/implementation mismatch fixed**: `matchVariant` in `lib/prompt-variant.js` documented "model matches the `provider/model` string", while the implementation matches the `model` field itself (`^claude` matches a model-name prefix). Anyone writing a rule from the comment would have written one that never fires; the comment now matches the code.
+- **Self-test coverage** (with the local plaintexts present): model→variant mapping (including the aggregator channel's non-Qwen models staying on the default variant), manual pin, fallback when a variant is absent, user rules beating built-ins, three-tier refusal detection (head / whole-text templates / tail), eight false-positive regressions (third-person capability statements, ordinary technical prose, conditional capability statements, honest limitation notes inside a disclaimer section, a disclaimer section with no refusal, a mid-text refusal outside both windows, "出于安全考虑" used as security advice, an English first-person technical statement), honorific forms and the bare opener, byte-identical authorized scope across variants, slot integrity, and an **end-to-end** pass through the real `lib/core.js` resolution (model → variant → encrypted slot).
+- **Round-trip fidelity of the stock prompts**: the decrypt → write → edit → reseal chain does not alter a single byte of an existing stock prompt — the original slots are pulled out of `git show HEAD:lib/asset-table.js` and compared byte-for-byte against the local plaintext, and both default and claude pass. The qwen prompt is the only addition.
+- **False positives in refusal detection fixed** (`lib/refusal-recovery.js`) — "stance" and "refusal" are now separate concepts:
+  - A **stance** (抱歉 / 不好意思 / 作为AI助手 / 我理解…但 / sorry / as an AI) only says the model is taking a position; **on its own it is not a refusal** — "抱歉，连接超时了", "作为AI助手，我可以帮你…" and "Sorry, one sec" are all perfectly normal answers. A stance rule now has to find a refusal clause (不能提供 / 无法协助 / can't help) **in the same sentence** to count.
+  - Two real false positives fixed along the way: the subject-less form of "不能/无法 + 帮助|协助|提供|完成|执行|回答|满足" now only counts **at the start of a sentence** (`该组件无法提供热更新` and `系统不能执行超过 10 个并发` are no longer refusals); the first-person branch no longer takes `完成|执行` — "我无法完成部署" is a capability statement, which is what the code's own comment always claimed even though the implementation disagreed.
+  - **The cost of a false positive is not "a wasted chance"**: it burns the turn's only re-anchor budget (`maxPerTurn=1`), closes the sticky gate, and injects a spurious user message into the conversation — so a real refusal later in the same turn can no longer be recovered. Measured: a single "作为AI助手，我可以帮你…" is enough to make the genuine refusal in that same reply permanently unrecoverable.
+- **Non-Chinese/non-English refusals no longer all slip through** (same file): anchor rule 1 requires the reply to follow the operator's language, so a non-Chinese operator gets a non-Chinese refusal — with a zh/en-only vocabulary **8 out of 8 measured cases were missed** and recovery never fired once. Added "stance + refusal clause" rules for Japanese, Korean, Russian, Spanish, French, German, Portuguese and Italian.
+  - The Russian rule hit a real trap: JavaScript's `\b` only knows `[A-Za-z0-9_]`, Cyrillic letters are not `\w`, and there is no word boundary between a space and "я" — `\b` can never match in Russian. Replaced with explicit lookarounds.
+- **Model-family self-identification filled in** (`lib/refusal-recovery.js` + `lib/anchor.js`): the aggregator channel still carries `glm-5.*` / `kimi-k2.*` / `MiniMax-M2.5`, and they all land on the `default` variant today — but the detector's self-identification vocabulary only knew Qwen / 通义 / 千问, so none of their "as an X model" refusals were ever caught. The detector and the anchor's banned-opener list now also cover `智谱 / GLM / Kimi / 月之暗面 / MiniMax / 豆包 / DeepSeek`.
+- **Tail anchor's banned-opener list filled in** (`lib/anchor.js`): 19 entries → 50 — adding the ones the detector knows but the list did not (`I will decline` / `I will refuse` / `against my programming` / `based on my guidelines` / `我做不到` / `不好意思` / `恕难从命` / `我必须拒绝` / `婉拒` …) plus the non-Chinese/non-English stances. The top-level and subagent templates keep byte-identical lists.
+- **Re-anchor text now honours the option** (`lib/index.js`): `createRefusalRecovery`'s `reanchorText` option was dead — the call site sent the module constant `REANCHOR_TEXT` directly. It now sends `recovery.reanchorText` (which resolves to that same constant when nothing is passed, so behaviour is unchanged), so swapping the re-anchor wording no longer requires a code change.
+- **Self-test 142/142**: new section F "refusal-detection precision (false-positive regressions)" — 7 stance regressions, 4 subject-less technical-statement regressions, 10 true refusals that must still be caught, 8 non-Chinese/non-English refusals, the cascading cost of a false positive (sticky gate + session budget), and coverage checks over the anchor's banned-opener list.
+
 # 1.1.96
 
 ## 中文
